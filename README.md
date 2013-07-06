@@ -66,12 +66,14 @@ server.listen(8080);
 ### On the Client
 
 ```
-var socket = eio('ws://localhost');
-socket.onopen = function(){
+var primus = Primus.connect('ws://localhost:8080');
 
-  // Join the news room
-  socket.write('news');
-};
+primus.on('open', function () {
+
+  // Send request to join the news room
+  primus.write('news');
+
+});
 
 ```
 
