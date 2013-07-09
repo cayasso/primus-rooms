@@ -39,8 +39,52 @@ describe('primus-rooms', function () {
       primus.on('connection', function(spark){
         spark.join('room1');
         spark.room('room1').clients(function (err, clients) {
-          expect(~clients.indexOf(spark.id)).to.be.ok();
+          expect(!!~clients.indexOf(spark.id)).to.eql(true);
           done();
+        });
+      });
+      client(srv, primus);
+    });
+  });
+
+  it('should join multiple rooms at once', function(done){
+    var srv = http();
+    var primus = new Primus(srv, opts);
+    srv.listen(function(){      
+      primus.on('connection', function(spark){
+        spark.join('room1 room2 room3', function(){
+          spark.room('room1').clients(function (err, clients) {
+            expect(!!~clients.indexOf(spark.id)).to.be.ok();
+            spark.room('room2').clients(function (err, clients) {
+              expect(!!~clients.indexOf(spark.id)).to.be.ok();
+              spark.room('room3').clients(function (err, clients) {
+                expect(!!~clients.indexOf(spark.id)).to.be.ok();
+                done();
+              });
+            });
+          });
+        });    
+      });
+      client(srv, primus);
+    });
+  });
+
+  it('should join multiple rooms at once passing an array as argument', function(done){
+    var srv = http();
+    var primus = new Primus(srv, opts);
+    srv.listen(function(){
+      primus.on('connection', function(spark){
+        spark.join(['room1', 'room2', 'room3'], function(){
+          spark.room('room1').clients(function (err, clients) {
+            expect(!!~clients.indexOf(spark.id)).to.be.ok();
+            spark.room('room2').clients(function (err, clients) {
+              expect(!!~clients.indexOf(spark.id)).to.be.ok();
+              spark.room('room3').clients(function (err, clients) {
+                expect(!!~clients.indexOf(spark.id)).to.be.ok();
+                done();
+              });
+            });
+          });
         });
       });
       client(srv, primus);
@@ -55,9 +99,41 @@ describe('primus-rooms', function () {
         spark.join('room1');
         spark.leave('room1');
         spark.room('room1').clients(function (err, clients) {
-          expect(~clients.indexOf(spark.id)).not.to.be(true);
+          expect(!!~clients.indexOf(spark.id)).to.eql(false);
           done();
         });
+      });
+      client(srv, primus);
+    });
+  });
+
+  it('should leave multiple rooms at once', function(done){
+    var srv = http();
+    var primus = new Primus(srv, opts);
+    srv.listen(function(){      
+      primus.on('connection', function(spark){
+        spark.join('room1 room2 room3 room4', function () {
+          spark.leave('room1 room2 room3', function(){
+            expect(spark.rooms()).to.eql(['room4']);
+            done();
+          });
+        });
+      });
+      client(srv, primus);
+    });
+  });
+
+  it('should leave multiple rooms at once passing an array', function(done){
+    var srv = http();
+    var primus = new Primus(srv, opts);
+    srv.listen(function(){      
+      primus.on('connection', function(spark){
+        spark.join('room1 room2 room3 room4', function () {
+          spark.leave(['room1', 'room2', 'room3'], function(){
+            expect(spark.rooms()).to.be.eql(['room4']);
+            done();
+          });
+        });       
       });
       client(srv, primus);
     });
@@ -72,10 +148,27 @@ describe('primus-rooms', function () {
         spark.join('room2');
         spark.join('room3');
         spark.leaveAll();
-        spark.room('room1').clients(function (err, clients) {
-          expect(~clients.indexOf(spark.id)).not.to.be(true);
-          done();
-        });
+        expect(spark.rooms()).to.be.eql([]);
+        done();
+      });
+      client(srv, primus);
+    });
+  });
+
+  it('should allow method channing', function(done){
+    var srv = http();
+    var primus = new Primus(srv, opts);
+    srv.listen(function(){      
+      primus.on('connection', function(spark){
+        spark
+        .join('room1')
+        .join('room2')
+        .join('room3')
+        .leave('room1')
+        .leave('room2')
+        .leave('room3');
+        expect(spark.rooms()).to.eql([]);
+        done();
       });
       client(srv, primus);
     });
