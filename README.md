@@ -115,7 +115,7 @@ Join client to a `room`, `fn` is optional callback.
 spark.join('room');
 ```
 
-Join multiple rooms at the same time.
+Join multiple rooms at once.
 
 ```
 spark.join('room1 room2 room3', fn);
@@ -123,7 +123,7 @@ spark.join('room1 room2 room3', fn);
 
 ### spark#room(name, [fn])
 
-Target an specific `room`.
+Target a specific `room`.
 
 ```
 spark.room('room').write('hi');
@@ -132,7 +132,7 @@ spark.room('room').clients();
 
 ### spark#room#write(message)
 
-Send a message to an specific `room`.
+Send a message to a specific `room`.
 
 ```
 spark.room('room').write('hi');
@@ -140,7 +140,7 @@ spark.room('room').write('hi');
 
 ### spark#room#clients()
 
-Get all clients `id` connected to specific `room`.
+Get all client `ids` connected to specific `room`.
 
 ```
 spark.room('room').clients();
@@ -148,7 +148,7 @@ spark.room('room').clients();
 
 ### sparkt#leave(name)
 
-Leave an specific `room`.
+Leave a specific `room`.
 
 ```
 spark.leave('room');
