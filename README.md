@@ -77,6 +77,105 @@ primus.on('open', function () {
 
 ```
 
+## API
+
+### Rooms(Primus, [options])
+
+Add rooms functionality to `Primus` server instance. 
+The options parameter is optional.
+
+```
+Rooms(Primus);
+
+// or do with a custom adapter
+Rooms(Primus, { adapter: MyAdapter });
+```
+
+Options are:
+
+`options.adapter`
+
+### Rooms#adapter(Adapter)
+
+Set your own `adapter` for rooms, by default `primus-rooms` comes 
+with its own `memory` adapter but its easy to provide a custom one.
+
+```
+Rooms(Primus);
+
+// set to my own adapter
+Rooms.adapter(MyAdapter);
+```
+
+### spark#join(name, [fn])
+
+Join client to a `room`, `fn` is optional callback.
+
+```
+spark.join('room');
+```
+
+Join multiple rooms at the same time.
+
+```
+spark.join('room1 room2 room3', fn);
+```
+
+### spark#room(name, [fn])
+
+Target an specific `room`.
+
+```
+spark.room('room').write('hi');
+spark.room('room').clients();
+```
+
+### spark#room#write(message)
+
+Send a message to an specific `room`.
+
+```
+spark.room('room').write('hi');
+```
+
+### spark#room#clients()
+
+Get all clients `id` connected to specific `room`.
+
+```
+spark.room('room').clients();
+```
+
+### sparkt#leave(name)
+
+Leave an specific `room`.
+
+```
+spark.leave('room');
+```
+
+Leave multiple rooms at once.
+
+```
+spark.leave('room1 room2 room3');
+```
+
+### spark#leaveAll()
+
+Leave all rooms the client has joined.
+
+```
+spark.leaveAll();
+```
+
+### spark#rooms()
+
+Get all rooms client is connected to.
+
+```
+spark.rooms();
+```
+
 ## Run tests
 
 ```
