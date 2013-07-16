@@ -1,31 +1,36 @@
 var Primus = require('primus');
-var PrimusRooms = require('../');
+var Rooms = require('../');
 var http = require('http').Server;
 var expect = require('expect.js');
 var opts = { transformer: 'sockjs', parser: 'JSON' };
 
-// Use rooms plugin
-PrimusRooms(Primus);
 
-// creates a spark.io client for the given server
+// creates the client
 function client(srv, primus, port){
   var addr = srv.address();
   var url = 'http://' + addr.address + ':' + (port || addr.port);
   return new primus.Socket(url);
 }
 
+// creates the server
+function server(srv, opts) {
+  // use rooms plugin
+  return Primus(srv, opts).use('rooms', Rooms);
+}
+
 describe('primus-rooms', function () {
 
   it('should have required methods', function(done){
     var srv = http();
-    var primus = new Primus(srv, opts);
+    var primus = server(srv, opts);
     srv.listen(function(){
-      primus.on('connection', function (spark) {        
+      primus.on('connection', function (spark) {
         expect(spark.join).to.be.a('function');
         expect(spark.leave).to.be.a('function');
         expect(spark.leaveAll).to.be.a('function');
         expect(spark.room).to.be.a('function');
-        expect(spark.broadcast).to.be.a('function');
+        expect(spark.rooms).to.be.a('function');
+        expect(spark.clients).to.be.a('function');
         done();
       });
       client(srv, primus);
@@ -34,8 +39,8 @@ describe('primus-rooms', function () {
 
   it('should join room', function(done){
     var srv = http();
-    var primus = new Primus(srv, opts);
-    srv.listen(function(){      
+    var primus = server(srv, opts);
+    srv.listen(function(){ 
       primus.on('connection', function(spark){
         spark.join('room1');
         spark.room('room1').clients(function (err, clients) {
@@ -49,7 +54,7 @@ describe('primus-rooms', function () {
 
   it('should join multiple rooms at once', function(done){
     var srv = http();
-    var primus = new Primus(srv, opts);
+    var primus = server(srv, opts);
     srv.listen(function(){      
       primus.on('connection', function(spark){
         spark.join('room1 room2 room3', function(){
@@ -63,7 +68,7 @@ describe('primus-rooms', function () {
               });
             });
           });
-        });    
+        });
       });
       client(srv, primus);
     });
@@ -71,7 +76,7 @@ describe('primus-rooms', function () {
 
   it('should join multiple rooms at once passing an array as argument', function(done){
     var srv = http();
-    var primus = new Primus(srv, opts);
+    var primus = server(srv, opts);
     srv.listen(function(){
       primus.on('connection', function(spark){
         spark.join(['room1', 'room2', 'room3'], function(){
@@ -93,7 +98,7 @@ describe('primus-rooms', function () {
 
   it('should leave room', function(done){
     var srv = http();
-    var primus = new Primus(srv, opts);
+    var primus = server(srv, opts);
     srv.listen(function(){      
       primus.on('connection', function(spark){
         spark.join('room1');
@@ -109,7 +114,7 @@ describe('primus-rooms', function () {
 
   it('should leave multiple rooms at once', function(done){
     var srv = http();
-    var primus = new Primus(srv, opts);
+    var primus = server(srv, opts);
     srv.listen(function(){      
       primus.on('connection', function(spark){
         spark.join('room1 room2 room3 room4', function () {
@@ -125,15 +130,15 @@ describe('primus-rooms', function () {
 
   it('should leave multiple rooms at once passing an array', function(done){
     var srv = http();
-    var primus = new Primus(srv, opts);
-    srv.listen(function(){      
+    var primus = server(srv, opts);
+    srv.listen(function(){
       primus.on('connection', function(spark){
         spark.join('room1 room2 room3 room4', function () {
           spark.leave(['room1', 'room2', 'room3'], function(){
             expect(spark.rooms()).to.be.eql(['room4']);
             done();
           });
-        });       
+        });
       });
       client(srv, primus);
     });
@@ -141,7 +146,7 @@ describe('primus-rooms', function () {
 
   it('should leave all rooms', function(done){
     var srv = http();
-    var primus = new Primus(srv, opts);
+    var primus = server(srv, opts);
     srv.listen(function(){
       primus.on('connection', function(spark){
         spark.join('room1');
@@ -157,8 +162,8 @@ describe('primus-rooms', function () {
 
   it('should allow method channing', function(done){
     var srv = http();
-    var primus = new Primus(srv, opts);
-    srv.listen(function(){      
+    var primus = server(srv, opts);
+    srv.listen(function(){
       primus.on('connection', function(spark){
         spark
         .join('room1')
@@ -177,7 +182,7 @@ describe('primus-rooms', function () {
   it('should allow simple connection', function(done){
     this.timeout(0);
     var srv = http();
-    var primus = new Primus(srv, opts);
+    var primus = server(srv, opts);
 
     srv.listen(function(){
       var c1 = client(srv, primus);
@@ -199,7 +204,7 @@ describe('primus-rooms', function () {
   it('should allow sending to multiple rooms', function(done){
     this.timeout(0);
     var srv = http();
-    var primus = new Primus(srv, opts);
+    var primus = server(srv, opts);
     var total = 3;
     srv.listen(function(){
 
@@ -256,10 +261,10 @@ describe('primus-rooms', function () {
   it('should avoid sending dupes', function(done){
     this.timeout(0);
     var srv = http();
-    var primus = new Primus(srv, opts);
+    var primus = server(srv, opts);
     var total = 2;
 
-    srv.listen(function(){      
+    srv.listen(function(){
       primus.on('connection', function(spark){
         spark.join('room1');
         spark.join('room2');
@@ -293,9 +298,9 @@ describe('primus-rooms', function () {
 
   it('should get all clients(id) connected to a room', function(done){
     var srv = http();
-    var primus = new Primus(srv, opts);
+    var primus = server(srv, opts);
     var ids = [];
-    srv.listen(function(){      
+    srv.listen(function(){
       primus.on('connection', function(spark){
         ids.push(spark.id);
         spark.join('room1');
@@ -316,7 +321,7 @@ describe('primus-rooms', function () {
 
   it('should keeps track of rooms', function(done){
     var srv = http();
-    var primus = new Primus(srv, opts);
+    var primus = server(srv, opts);
     srv.listen(function(){
       var conn = client(srv, primus);
       primus.on('connection', function(s){

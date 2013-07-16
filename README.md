@@ -28,12 +28,12 @@ var primus = new Primus(server, { transformer: 'websockets', parser: 'JSON' });
 primus.on('connection', function (spark) {
 
   // joining room1 & room2
-  spark.join('room1');
-  spark.join('room2');
-  spark.join('room3');
+  spark.join('room1', fn);
+  spark.join('room2', fn);
+  spark.join('room3', fn);
 
   // leaving room room2
-  spark.leave('room2');
+  spark.leave('room2', fn);
 
   // get rooms I am connected to
   var myRooms = spark.rooms();
@@ -127,7 +127,7 @@ Target a specific `room`.
 
 ```
 spark.room('room').write('hi');
-spark.room('room').clients();
+spark.room('room').clients(fn);
 ```
 
 ### spark#room#write(message)
@@ -138,26 +138,26 @@ Send a message to a specific `room`.
 spark.room('room').write('hi');
 ```
 
-### spark#room#clients()
+### spark#room#clients(fn)
 
 Get all client `ids` connected to specific `room`.
 
 ```
-spark.room('room').clients();
+spark.room('room').clients(fn);
 ```
 
-### sparkt#leave(name)
+### sparkt#leave(name, [fn])
 
-Leave a specific `room`.
+Leave a specific `room`, `fn` is optional callback.
 
 ```
-spark.leave('room');
+spark.leave('room', fn);
 ```
 
 Leave multiple rooms at once.
 
 ```
-spark.leave('room1 room2 room3');
+spark.leave('room1 room2 room3', fn);
 ```
 
 ### spark#leaveAll()
