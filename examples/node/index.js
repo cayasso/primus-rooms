@@ -3,11 +3,13 @@ var Primus = require('primus');
 var http = require('http');
 var server = http.createServer();
 
-// Add room functionality to primus
-Primus.use('rooms', Rooms);
+
 
 // THE SERVER
 var primus = new Primus(server, { transformer: 'sockjs', parser: 'JSON' });
+
+// Add room functionality to primus
+primus.use('rooms', Rooms);
 
 // Server stuff
 primus.on('connection', function(spark){
