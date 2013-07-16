@@ -178,7 +178,7 @@ describe('primus-rooms', function () {
       client(srv, primus);
     });
   });
-
+  
   it('should allow simple connection', function(done){
     this.timeout(0);
     var srv = http();
@@ -336,6 +336,24 @@ describe('primus-rooms', function () {
           });
         });
       });
+    });
+  });
+
+  it('should allow passing adapter as argument', function(done){
+    var srv = http();
+
+    opts.adapter = {
+      add: function (){},
+      del: function (){},
+      delAll: function (){},
+      broadcast: function (){},
+      clients: function (){}
+    };
+
+    var primus = server(srv, opts);
+    srv.listen(function(){
+      expect(primus.adapter()).to.be.eql(opts.adapter);
+      done();
     });
   });
 });
