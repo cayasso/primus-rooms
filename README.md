@@ -16,14 +16,15 @@ npm install primus-rooms
 ### On the Server
 
 ```
-var primus = require('primus');
-var PrimusRooms = require('primus-rooms');
+var Primus = require('primus');
+var Rooms = require('primus-rooms');
 var server = require('http').createServer();
 
-// add rooms to Primus
-PrimusRooms(Primus);
-
+// primus instance
 var primus = new Primus(server, { transformer: 'websockets', parser: 'JSON' });
+
+// add rooms to Primus
+primus.use('rooms', Rooms);
 
 primus.on('connection', function (spark) {
 
@@ -79,32 +80,18 @@ primus.on('open', function () {
 
 ## API
 
-### Rooms(Primus, [options])
-
-Add rooms functionality to `Primus` server instance. 
-The options parameter is optional.
-
-```
-Rooms(Primus);
-
-// or do with a custom adapter
-Rooms(Primus, { adapter: MyAdapter });
-```
-
-Options are:
-
-`options.adapter`
-
-### Rooms#adapter(Adapter)
+### primus#adapter(Adapter)
 
 Set your own `adapter` for rooms, by default `primus-rooms` comes 
 with its own `memory` adapter but its easy to provide a custom one.
 
 ```
-Rooms(Primus);
+// as argument
+var primus = new Primus(url, { transformer: 'sockjs', adapter: myAdapter });
+primus.use('rooms', Rooms);
 
-// set to my own adapter
-Rooms.adapter(MyAdapter);
+// by calling the method
+primus.adapter(new MyAdapter());
 ```
 
 ### spark#join(name, [fn])
