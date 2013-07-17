@@ -178,7 +178,7 @@ describe('primus-rooms', function () {
       client(srv, primus);
     });
   });
-  
+
   it('should allow simple connection', function(done){
     this.timeout(0);
     var srv = http();
@@ -341,7 +341,6 @@ describe('primus-rooms', function () {
 
   it('should allow passing adapter as argument', function(done){
     var srv = http();
-
     opts.adapter = {
       add: function (){},
       del: function (){},
@@ -349,11 +348,54 @@ describe('primus-rooms', function () {
       broadcast: function (){},
       clients: function (){}
     };
-
     var primus = server(srv, opts);
     srv.listen(function(){
       expect(primus.adapter()).to.be.eql(opts.adapter);
       done();
+    });
+  });
+
+  it('should allow setting and getting adapter', function(done){
+    var srv = http();
+    var adapter = {
+      add: function (){},
+      del: function (){},
+      delAll: function (){},
+      broadcast: function (){},
+      clients: function (){}
+    };
+    var primus = server(srv, opts);
+    srv.listen(function(){
+      primus.adapter(adapter);
+      expect(primus.adapter()).to.be.eql(adapter);
+      done();
+    });
+  });
+
+  it('should only allow objects as adapter', function(){
+    var srv = http();
+    var primus = server(srv, opts);
+    var msg = 'Adapter should be an object';
+    srv.listen(function(){
+      try {
+        primus.adapter('not valid');
+      } catch (e) {
+        expect(e.message).to.be(msg);
+      }
+
+      try {
+        primus.adapter(function(){});
+      } catch (e) {
+        expect(e.message).to.be(msg);
+      }
+
+      try {
+        primus.adapter(123456);
+      } catch (e) {
+        return expect(e.message).to.be(msg);
+      }
+
+      throw new Error('I should have throwed above');
     });
   });
 });
