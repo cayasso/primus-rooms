@@ -160,6 +160,36 @@ describe('primus-rooms', function () {
     });
   });
 
+  it('should cleanup room on leave', function(done){
+    var srv = http();
+    var primus = server(srv, opts);
+    srv.listen(function(){
+      primus.on('connection', function(spark){
+        spark.join('room1');
+        spark.leave('room1');
+        expect(spark.primus.adapter().rooms).to.be.empty();
+        done();
+      });
+      client(srv, primus);
+    });
+  });
+
+  it('should cleanup rooms on leave all', function(done){
+    var srv = http();
+    var primus = server(srv, opts);
+    srv.listen(function(){
+      primus.on('connection', function(spark){
+        spark.join('room1');
+        spark.join('room2');
+        spark.join('room3');
+        spark.leaveAll();
+        expect(spark.primus.adapter().rooms).to.be.empty();
+        done();
+      });
+      client(srv, primus);
+    });
+  });
+
   it('should allow method channing', function(done){
     var srv = http();
     var primus = server(srv, opts);
