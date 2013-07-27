@@ -15,7 +15,7 @@ npm install primus-rooms
 
 ### On the Server
 
-```
+```javascript
 var Primus = require('primus');
 var Rooms = require('primus-rooms');
 var server = require('http').createServer();
@@ -55,7 +55,7 @@ primus.on('connection', function (spark) {
   spark.leaveAll();
 
   // join rooms on request
-  spark.on('message', function(room) {
+  spark.on('data', function(room) {
     spark.join(room);
   });
 
@@ -66,7 +66,7 @@ server.listen(8080);
 
 ### On the Client
 
-```
+```javascript
 var primus = Primus.connect('ws://localhost:8080');
 
 primus.on('open', function () {
@@ -85,7 +85,7 @@ primus.on('open', function () {
 Set your own `adapter` for rooms, by default `primus-rooms` comes 
 with its own `memory` adapter but its easy to provide a custom one.
 
-```
+```javascript
 // as argument
 var primus = new Primus(url, { transformer: 'sockjs', adapter: myAdapter });
 primus.use('rooms', Rooms);
@@ -98,13 +98,13 @@ primus.adapter(new MyAdapter());
 
 Join client to a `room`, `fn` is optional callback.
 
-```
+```javascript
 spark.join('room');
 ```
 
 Join multiple rooms at once.
 
-```
+```javascript
 spark.join('room1 room2 room3', fn);
 ```
 
@@ -112,7 +112,7 @@ spark.join('room1 room2 room3', fn);
 
 Target a specific `room`.
 
-```
+```javascript
 spark.room('room').write('hi');
 spark.room('room').clients(fn);
 ```
@@ -121,7 +121,7 @@ spark.room('room').clients(fn);
 
 Send a message to a specific `room`.
 
-```
+```javascript
 spark.room('room').write('hi');
 ```
 
@@ -129,7 +129,7 @@ spark.room('room').write('hi');
 
 Get all client `ids` connected to specific `room`.
 
-```
+```javascript
 spark.room('room').clients(fn);
 ```
 
@@ -137,13 +137,13 @@ spark.room('room').clients(fn);
 
 Leave a specific `room`, `fn` is optional callback.
 
-```
+```javascript
 spark.leave('room', fn);
 ```
 
 Leave multiple rooms at once.
 
-```
+```javascript
 spark.leave('room1 room2 room3', fn);
 ```
 
@@ -151,7 +151,7 @@ spark.leave('room1 room2 room3', fn);
 
 Leave all rooms the client has joined.
 
-```
+```javascript
 spark.leaveAll();
 ```
 
@@ -159,7 +159,7 @@ spark.leaveAll();
 
 Get all rooms client is connected to.
 
-```
+```javascript
 spark.rooms();
 ```
 
