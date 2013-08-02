@@ -8,6 +8,6 @@
   },
   "license": "MIT",
   "dependencies": {
-    "primus": "1.0.x"    
+    "primus": "1.0.x"
   }
 }
