@@ -38,6 +38,7 @@ primus.on('connection', function (spark) {
     if ('join' === action) {
       spark.join(room, function () {
 
+        // send message to this client
         spark.write('you joined room ' + room);
 
         // send message to all clients except this one
@@ -48,7 +49,8 @@ primus.on('connection', function (spark) {
     // leave a room
     if ('leave' === action) {
       spark.leave(room, function () {
-        console.log('leaving room:', room);
+        
+        // send message to this client
         spark.write('you left room ' + room);
       });
     }
@@ -56,6 +58,7 @@ primus.on('connection', function (spark) {
   });
 
 });
+
 server.listen(8080);
 ```
 
