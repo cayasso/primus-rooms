@@ -21,46 +21,41 @@ var Rooms = require('primus-rooms');
 var server = require('http').createServer();
 
 // primus instance
-var primus = new Primus(server, { transformer: 'websockets', parser: 'JSON' });
+var primus = new Primus(server, { transformer: 'websockets' });
 
 // add rooms to Primus
 primus.use('rooms', Rooms);
 
 primus.on('connection', function (spark) {
 
-  // joining room1 & room2
-  spark.join('room1', fn);
-  spark.join('room2', fn);
-  spark.join('room3', fn);
+  spark.on('data', function(data) {
 
-  // leaving room room2
-  spark.leave('room2', fn);
+    data = data || {};
+    var action = data.action;
+    var room = data.room;
 
-  // get rooms I am connected to
-  var myRooms = spark.rooms();
-  console.log(myRooms); // ['room1', 'room3']
+    // join a room
+    if ('join' === action) {
+      spark.join(room, function () {
 
-  // send data to room1
-  spark.room('room1').write('hi');
+        spark.write('you joined room ' + room);
 
-  // send data to room1 & room3
-  spark.room('room1 room3').write('hi');
+        // send message to all clients except this one
+        spark.room(room).write(spark.id + ' joined room ' + room);
+      });
+    }
 
-  // get clients connected to room1
-  spark.room('room1').clients(function(clients) {
-    console.log(clients); // output array of spark ids
-  });
+    // leave a room
+    if ('leave' === action) {
+      spark.leave(room, function () {
+        console.log('leaving room:', room);
+        spark.write('you left room ' + room);
+      });
+    }
 
-  // leaving all rooms
-  spark.leaveAll();
-
-  // join rooms on request
-  spark.on('data', function(room) {
-    spark.join(room);
   });
 
 });
-
 server.listen(8080);
 ```
 
@@ -72,7 +67,15 @@ var primus = Primus.connect('ws://localhost:8080');
 primus.on('open', function () {
 
   // Send request to join the news room
-  primus.write('news');
+  primus.write({ action: 'join', room: 'news' });
+
+  // Send request to leave the news room
+  primus.write({ action: 'leave', room: 'news' });
+
+  // print server message
+  primus.on('data', function (message) {
+    console.log(message);
+  });
 
 });
 

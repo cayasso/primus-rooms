@@ -3,7 +3,7 @@ var Rooms = require('../');
 var http = require('http').Server;
 var expect = require('expect.js');
 var opts = { transformer: 'sockjs', parser: 'JSON' };
-
+var srv;
 
 // creates the client
 function client(srv, primus, port){
@@ -31,7 +31,9 @@ describe('primus-rooms', function () {
         expect(spark.room).to.be.a('function');
         expect(spark.rooms).to.be.a('function');
         expect(spark.clients).to.be.a('function');
+        srv.close();
         done();
+        //srv.close();
       });
       client(srv, primus);
     });
@@ -45,6 +47,7 @@ describe('primus-rooms', function () {
         spark.join('room1');
         spark.room('room1').clients(function (err, clients) {
           expect(!!~clients.indexOf(spark.id)).to.eql(true);
+          srv.close();
           done();
         });
       });
@@ -64,6 +67,7 @@ describe('primus-rooms', function () {
               expect(!!~clients.indexOf(spark.id)).to.be.ok();
               spark.room('room3').clients(function (err, clients) {
                 expect(!!~clients.indexOf(spark.id)).to.be.ok();
+                srv.close();
                 done();
               });
             });
@@ -86,6 +90,7 @@ describe('primus-rooms', function () {
               expect(!!~clients.indexOf(spark.id)).to.be.ok();
               spark.room('room3').clients(function (err, clients) {
                 expect(!!~clients.indexOf(spark.id)).to.be.ok();
+                srv.close();
                 done();
               });
             });
@@ -105,6 +110,7 @@ describe('primus-rooms', function () {
         spark.leave('room1');
         spark.room('room1').clients(function (err, clients) {
           expect(!!~clients.indexOf(spark.id)).to.eql(false);
+          srv.close();
           done();
         });
       });
@@ -120,6 +126,7 @@ describe('primus-rooms', function () {
         spark.join('room1 room2 room3 room4', function () {
           spark.leave('room1 room2 room3', function(){
             expect(spark.rooms()).to.eql(['room4']);
+            srv.close();
             done();
           });
         });
@@ -136,6 +143,7 @@ describe('primus-rooms', function () {
         spark.join('room1 room2 room3 room4', function () {
           spark.leave(['room1', 'room2', 'room3'], function(){
             expect(spark.rooms()).to.be.eql(['room4']);
+            srv.close();
             done();
           });
         });
@@ -154,6 +162,7 @@ describe('primus-rooms', function () {
         spark.join('room3');
         spark.leaveAll();
         expect(spark.rooms()).to.be.eql([]);
+        srv.close();
         done();
       });
       client(srv, primus);
@@ -168,6 +177,7 @@ describe('primus-rooms', function () {
         spark.join('room1');
         spark.leave('room1');
         expect(spark.primus.adapter().rooms).to.be.empty();
+        srv.close();
         done();
       });
       client(srv, primus);
@@ -184,6 +194,7 @@ describe('primus-rooms', function () {
         spark.join('room3');
         spark.leaveAll();
         expect(spark.primus.adapter().rooms).to.be.empty();
+        srv.close();
         done();
       });
       client(srv, primus);
@@ -202,8 +213,11 @@ describe('primus-rooms', function () {
         .leave('room1')
         .leave('room2')
         .leave('room3');
-        expect(spark.rooms()).to.eql([]);
-        done();
+        process.nextTick(function () {
+          expect(spark.rooms()).to.eql([]);
+          srv.close();
+          done();
+        }); 
       });
       client(srv, primus);
     });
@@ -224,7 +238,10 @@ describe('primus-rooms', function () {
 
       c1.on('open', function () {
         c1.on('data', function (data) {
-          if ('send' === data); done();
+          if ('send' === data) {
+            srv.close();
+            done();
+          }
         });
       });
       c1.write('send');
@@ -232,7 +249,7 @@ describe('primus-rooms', function () {
   });
 
   it('should allow sending to multiple rooms', function(done){
-    this.timeout(0);
+    //this.timeout(0);
     var srv = http();
     var primus = server(srv, opts);
     var total = 3;
@@ -255,24 +272,29 @@ describe('primus-rooms', function () {
       });
 
       c1.on('data', function (data) {
-        done(new Error('not'));
+        finish(new Error('not'));
       });
 
       c2.on('data', function (data) {
-        --total || done();
+        --total || finish();
       });
 
       c3.on('data', function (data) {
-        --total || done();
+        --total || finish();
       });
 
       c4.on('data', function (data) {
-        --total || done();
+        --total || finish();
       });
 
       c5.on('data', function (data) {
-        done(new Error('not'));
+        finish(new Error('not'));
       });
+
+      function finish (data) {
+        srv.close();
+        done(data);
+      }
 
       c1.write('room1');
       c2.write('room1');
@@ -289,7 +311,7 @@ describe('primus-rooms', function () {
   });
 
   it('should avoid sending dupes', function(done){
-    this.timeout(0);
+
     var srv = http();
     var primus = server(srv, opts);
     var total = 2;
@@ -312,13 +334,18 @@ describe('primus-rooms', function () {
 
       c2.on('data', function (data) {
         expect('a' === data);
-        --total || done();
+        --total || finish();
       });
 
       c3.on('data', function (data) {
         expect('a' === data);
-        --total || done();
+        --total || finish();
       });
+
+      function finish () {
+        srv.close();
+        done();
+      }
 
       setTimeout(function() {
         c1.write('send');
@@ -337,6 +364,7 @@ describe('primus-rooms', function () {
         spark.on('data', function (){
           spark.room('room1').clients(function (err, clients) {
             expect(clients).to.be.eql(ids);
+            srv.close();
             done();
           });
         });
@@ -361,6 +389,7 @@ describe('primus-rooms', function () {
             expect(s.rooms()).to.eql(['a', 'b']);
             s.leave('b', function(){
               expect(s.rooms()).to.eql(['a']);
+              srv.close();
               done();
             });
           });
@@ -381,6 +410,7 @@ describe('primus-rooms', function () {
     var primus = server(srv, opts);
     srv.listen(function(){
       expect(primus.adapter()).to.be.eql(opts.adapter);
+      srv.close();
       done();
     });
   });
@@ -398,6 +428,7 @@ describe('primus-rooms', function () {
     srv.listen(function(){
       primus.adapter(adapter);
       expect(primus.adapter()).to.be.eql(adapter);
+      srv.close();
       done();
     });
   });
@@ -428,4 +459,29 @@ describe('primus-rooms', function () {
       throw new Error('I should have throwed above');
     });
   });
+
+  it('should remove client from room on client disconnect', function(done){
+    this.timeout(0);
+    var srv = http();
+    var primus = server(srv, opts);
+    primus.adapter(new Rooms.Adapter());
+    srv.listen(function(){
+      var c1 = client(srv, primus);
+      primus.on('connection', function(spark){
+        spark.join('a');
+        spark.on('end', function () {            
+          expect(spark.rooms()).to.be.empty();
+          srv.close();
+          done();
+        });
+        spark.write('end');
+      });
+      c1.on('open', function () {
+        c1.on('data', function (data) {
+          if ('end' === data) c1.end();
+        });
+      });
+    });
+  });
+
 });
