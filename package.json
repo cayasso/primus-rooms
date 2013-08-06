@@ -33,12 +33,6 @@
     "mocha": "*",
     "expect.js": "*",
     "primus": "1.1.x",
-    "socket.io-client": "~0.9.16",
-    "engine.io-client": "~0.6.3",
-    "sockjs-client-node": "0.0.0",
-    "engine.io": "~0.6.3",
-    "socket.io": "~0.9.16",
-    "ws": "~0.4.27",
-    "sockjs": "~0.3.7"
+    "ws": "~0.4.27"
   }
 }
