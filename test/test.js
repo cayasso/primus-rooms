@@ -249,7 +249,7 @@ describe('primus-rooms', function () {
   });
 
   it('should allow sending to multiple rooms', function(done){
-    //this.timeout(0);
+    this.timeout(0);
     var srv = http();
     var primus = server(srv, opts);
     var total = 3;
@@ -305,7 +305,7 @@ describe('primus-rooms', function () {
 
       setTimeout(function() {
         c1.write('send');
-      }, 50);
+      }, 100);
 
     });
   });
