@@ -175,6 +175,11 @@ spark.rooms();
 make test
 ```
 
+## Other plugins
+
+ * [primus-multiplex](https://github.com/cayasso/primus-multiplex)
+ * [primus-emitter](https://github.com/cayasso/primus-emitter)
+
 ## License
 
 (The MIT License)

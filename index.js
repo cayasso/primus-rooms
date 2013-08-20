@@ -8,7 +8,7 @@ var PrimusRooms = require('./lib');
  * Exports modules.
  */
 
-exports.server = function server (primus, options) {
+exports.server = function server(primus, options) {
   primus.$ = primus.$ || {};
   primus.$.PrimusRooms = PrimusRooms;
   PrimusRooms(primus, options);
