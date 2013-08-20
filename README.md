@@ -171,8 +171,8 @@ spark.rooms();
 
 ## Run tests
 
-```
-make test
+``` bash
+$ make test
 ```
 
 ## Other plugins
