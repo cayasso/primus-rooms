@@ -33,7 +33,6 @@ describe('primus-rooms', function () {
         expect(spark.clients).to.be.a('function');
         srv.close();
         done();
-        //srv.close();
       });
       client(srv, primus);
     });
@@ -54,7 +53,7 @@ describe('primus-rooms', function () {
       client(srv, primus);
     });
   });
-
+  
   it('should join multiple rooms at once', function(done){
     var srv = http();
     var primus = server(srv, opts);
@@ -104,7 +103,7 @@ describe('primus-rooms', function () {
   it('should leave room', function(done){
     var srv = http();
     var primus = server(srv, opts);
-    srv.listen(function(){      
+    srv.listen(function(){  
       primus.on('connection', function(spark){
         spark.join('room1');
         spark.leave('room1');
@@ -117,7 +116,7 @@ describe('primus-rooms', function () {
       client(srv, primus);
     });
   });
-
+  
   it('should leave multiple rooms at once', function(done){
     var srv = http();
     var primus = server(srv, opts);
@@ -217,7 +216,7 @@ describe('primus-rooms', function () {
           expect(spark.rooms()).to.eql([]);
           srv.close();
           done();
-        }); 
+        });
       });
       client(srv, primus);
     });
@@ -469,7 +468,7 @@ describe('primus-rooms', function () {
       var c1 = client(srv, primus);
       primus.on('connection', function(spark){
         spark.join('a');
-        spark.on('end', function () {            
+        spark.on('end', function () {        
           expect(spark.rooms()).to.be.empty();
           srv.close();
           done();
@@ -481,6 +480,142 @@ describe('primus-rooms', function () {
           if ('end' === data) c1.end();
         });
       });
+    });
+  });
+
+  it('should join spark to a room using primus method', function(done){
+    var srv = http();
+    var primus = server(srv, opts);
+    primus.adapter(new Rooms.Adapter());
+    srv.listen(function(){
+      primus.on('connection', function(spark){
+        primus.join(spark, 'room1', function () {
+          spark.room('room1').clients(function (err, clients) {
+            expect(!!~clients.indexOf(spark.id)).to.eql(true);
+            srv.close();
+            done();
+          });
+        });
+      });
+      client(srv, primus);
+    });
+  });
+
+  it('should remove spark form room using primus method', function(done){
+    var srv = http();
+    var primus = server(srv, opts);
+    primus.adapter(new Rooms.Adapter());
+    srv.listen(function(){
+      primus.on('connection', function(spark){
+        primus.join(spark, 'room1', function () {
+          primus.leave(spark, 'room1', function () {
+            spark.room('room1').clients(function (err, clients) {
+              expect(!!~clients.indexOf(spark.id)).to.eql(false);
+              srv.close();
+              done();
+            });
+          });
+        });
+      });
+      client(srv, primus);
+    });
+  });
+
+  it('should broadcast message to specific room from primus usin `room`', function(done){
+
+    var srv = http();
+    var total = 2;
+    var primus = server(srv, opts);
+    primus.adapter(new Rooms.Adapter());
+    srv.listen(function(){
+      var count = 1;
+      var c1 = client(srv, primus);
+      var c2 = client(srv, primus);
+      var c3 = client(srv, primus);
+
+      primus.on('connection', function(spark){
+        spark.on('data', function (data) {
+          primus.join(spark, data, function () {
+            if (3 === count++) {
+              primus.room('a').write('hi');
+            }
+          });
+        });
+      });
+
+      c1.write('a');
+      c2.write('a');
+      c3.write('b');
+
+      c1.on('data', function (data) {
+        expect('hi' === data);
+        --total || finish();
+      });
+
+      c2.on('data', function (data) {
+        expect('hi' === data);
+        --total || finish();
+      });
+
+      c3.on('data', function (data) {
+        expect('hi' === data);
+        --total || finish(new Error('Should not get message'));
+      });
+
+      function finish (err) {
+        done(err);
+        srv.close();
+      }
+      
+    });
+  });
+
+  it('should broadcast message to multiple rooms from primus usin `room` method', function(done){
+
+    var srv = http();
+    var total = 2;
+    var primus = server(srv, opts);
+    primus.adapter(new Rooms.Adapter());
+    srv.listen(function(){
+      var count = 1;
+      var c1 = client(srv, primus);
+      var c2 = client(srv, primus);
+      var c3 = client(srv, primus);
+
+      primus.on('connection', function(spark){
+        spark.on('data', function (data) {
+          primus.join(spark, data, function () {
+            if (3 === count++) {
+              primus.room('a b').write('hi');
+            }
+          });
+        });
+      });
+
+      c1.write('a');
+      c2.write('b');
+      c3.write('c');
+
+      c1.on('data', function (data) {
+        expect('hi' === data);
+        --total || finish();
+      });
+
+      c2.on('data', function (data) {
+        expect('hi' === data);
+        --total || finish();
+      });
+
+      c3.on('data', function (data) {
+        expect('hi' === data);
+        --total || finish(new Error('Should not get message'));
+      });
+
+      function finish (err) {
+        done(err);
+        srv.close();
+      }
+      
     });
   });
 
