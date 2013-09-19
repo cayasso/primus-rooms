@@ -124,11 +124,10 @@ Target a specific `room` or rooms for broadcasting a message.
 primus.room('room').write('hi');
 ```
 
-These are equivalent methods:
+`in` is an equivalent method to `room`:
 
 ```javascript
 primus.in('room').write('hi');
-primus.to('room').write('hi');
 ```
 
 ### primus#room#write(message)
@@ -165,6 +164,13 @@ Target a specific `room`.
 ```javascript
 spark.room('room').write('hi');
 spark.room('room').clients(fn);
+```
+
+`in` is an equivalent method to `room`:
+
+```javascript
+spark.in('room').write('hi');
+spark.in('room').clients(fn);
 ```
 
 ### spark#room#write(message)
