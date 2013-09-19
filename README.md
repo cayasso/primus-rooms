@@ -100,6 +100,50 @@ primus.use('rooms', Rooms);
 primus.adapter(new MyAdapter());
 ```
 
+### primus#join(spark, name, [fn])
+
+Join client to a `room`, `fn` is optional callback.
+
+```javascript
+primus.join(spark, 'room', fn);
+```
+
+### primus#leave(spark, name, [fn])
+
+Remove client from a specific `room`, `fn` is optional callback.
+
+```javascript
+primus.leave(spark, 'room', fn);
+```
+
+### primus#room(spark, name, [fn])
+
+Target a specific `room` or rooms for broadcasting a message.
+
+```javascript
+primus.room('room').write('hi');
+```
+
+These are equivalent methods:
+
+```javascript
+primus.in('room').write('hi');
+primus.to('room').write('hi');
+```
+
+### primus#room#write(message)
+
+Send a message to a specific `room`.
+
+```javascript
+primus.room('room').write('hi');
+```
+or to multiple rooms at once:
+
+```javascript
+primus.room('sport news art').write('hi');
+```
+
 ### spark#join(name, [fn])
 
 Join client to a `room`, `fn` is optional callback.
