@@ -2,7 +2,7 @@ var Primus = require('primus');
 var Rooms = require('../');
 var http = require('http').Server;
 var expect = require('expect.js');
-var opts = { transformer: 'websockets', parser: 'JSON' };
+var opts = { transformer: 'websockets' };
 var srv;
 
 // creates the client
@@ -251,27 +251,28 @@ describe('primus-rooms', function () {
     this.timeout(0);
     var srv = http();
     var primus = server(srv, opts);
-    var total = 3;
+    var total = 2;
+    var count = 0;
+
     srv.listen(function(){
 
       var c1 = client(srv, primus);
       var c2 = client(srv, primus);
       var c3 = client(srv, primus);
       var c4 = client(srv, primus);
-      var c5 = client(srv, primus);
 
       primus.on('connection', function(spark){
         spark.on('data', function (data) {
-          spark.join(data);
-          if (data === 'send') {
-            spark.leave('send');
-            spark.room('room1 room2 room3 room4').write('a');
-          }
+          spark.join(data, function () {
+            if (3 === count++) {
+              spark.room('room1 room2 room3').write('a');
+            }
+          });
         });
       });
 
       c1.on('data', function (data) {
-        finish(new Error('not'));
+        --total || finish();
       });
 
       c2.on('data', function (data) {
@@ -283,10 +284,6 @@ describe('primus-rooms', function () {
       });
 
       c4.on('data', function (data) {
-        --total || finish();
-      });
-
-      c5.on('data', function (data) {
         finish(new Error('not'));
       });
 
@@ -296,15 +293,9 @@ describe('primus-rooms', function () {
       }
 
       c1.write('room1');
-      c2.write('room1');
       c2.write('room2');
       c3.write('room3');
       c4.write('room4');
-      c5.write('room5');
-
-      setTimeout(function() {
-        c1.write('send');
-      }, 100);
 
     });
   });
@@ -352,7 +343,7 @@ describe('primus-rooms', function () {
     });
   });
 
-  it('should get all clients(id) connected to a room', function(done){
+  it('should get all clients connected to a room', function(done){
     var srv = http();
     var primus = server(srv, opts);
     var ids = [];
@@ -366,6 +357,29 @@ describe('primus-rooms', function () {
             srv.close();
             done();
           });
+        });
+      });
+      client(srv, primus);
+      client(srv, primus);
+      client(srv, primus);
+      client(srv, primus)
+      .write('send');
+    });
+  });
+
+  it('should get all clients synchronously if no callback is provided', function(done){
+    var srv = http();
+    var primus = server(srv, opts);
+    var ids = [];
+    srv.listen(function(){
+      primus.on('connection', function(spark){
+        ids.push(spark.id);
+        spark.join('room1');
+        spark.on('data', function (){
+          var clients = spark.room('room1').clients();
+          expect(clients).to.be.eql(ids);
+          srv.close();
+          done();
         });
       });
       client(srv, primus);
@@ -406,9 +420,11 @@ describe('primus-rooms', function () {
       broadcast: function (){},
       clients: function (){}
     };
-    var primus = server(srv, opts);
+
+    var primus = Primus(srv, opts).use('rooms', Rooms);
     srv.listen(function(){
       expect(primus.adapter()).to.be.eql(opts.adapter);
+      delete opts.adapter;
       srv.close();
       done();
     });
@@ -423,7 +439,8 @@ describe('primus-rooms', function () {
       broadcast: function (){},
       clients: function (){}
     };
-    var primus = server(srv, opts);
+
+    var primus = Primus(srv, opts).use('rooms', Rooms);
     srv.listen(function(){
       primus.adapter(adapter);
       expect(primus.adapter()).to.be.eql(adapter);
@@ -463,7 +480,6 @@ describe('primus-rooms', function () {
     this.timeout(0);
     var srv = http();
     var primus = server(srv, opts);
-    primus.adapter(new Rooms.Adapter());
     srv.listen(function(){
       var c1 = client(srv, primus);
       primus.on('connection', function(spark){
@@ -483,10 +499,56 @@ describe('primus-rooms', function () {
     });
   });
 
+  it('should get all clients connected to a room using primus method', function(done){
+    var ids = [];
+    var srv = http();
+    var primus = server(srv, opts);
+    srv.listen(function(){
+      primus.on('connection', function(spark){
+        ids.push(spark.id);
+        primus.join(spark, 'room1');
+        spark.on('data', function (){
+          primus.room('room1').clients(function (err, clients) {
+            expect(clients).to.be.eql(ids);
+            srv.close();
+            done();
+          });
+        });
+      });
+      client(srv, primus);
+      client(srv, primus);
+      client(srv, primus);
+      client(srv, primus)
+      .write('send');
+    });
+  });
+
+  it('should get all clients synchronously if no callback is provided using primus method', function(done){
+    var ids = [];
+    var srv = http();
+    var primus = server(srv, opts);
+    srv.listen(function(){
+      primus.on('connection', function(spark){
+        ids.push(spark.id);
+        primus.join(spark, 'room1');
+        spark.on('data', function (){
+          var clients = primus.in('room1').clients();
+          expect(clients).to.be.eql(ids);
+          srv.close();
+          done();
+        });
+      });
+      client(srv, primus);
+      client(srv, primus);
+      client(srv, primus);
+      client(srv, primus)
+      .write('send');
+    });
+  });
+
   it('should join spark to a room using primus method', function(done){
     var srv = http();
     var primus = server(srv, opts);
-    primus.adapter(new Rooms.Adapter());
     srv.listen(function(){
       primus.on('connection', function(spark){
         primus.join(spark, 'room1', function () {
@@ -504,7 +566,6 @@ describe('primus-rooms', function () {
   it('should remove spark form room using primus method', function(done){
     var srv = http();
     var primus = server(srv, opts);
-    primus.adapter(new Rooms.Adapter());
     srv.listen(function(){
       primus.on('connection', function(spark){
         primus.join(spark, 'room1', function () {
@@ -526,7 +587,6 @@ describe('primus-rooms', function () {
     var srv = http();
     var total = 2;
     var primus = server(srv, opts);
-    primus.adapter(new Rooms.Adapter());
     srv.listen(function(){
       var count = 1;
       var c1 = client(srv, primus);
@@ -575,7 +635,6 @@ describe('primus-rooms', function () {
     var srv = http();
     var total = 2;
     var primus = server(srv, opts);
-    primus.adapter(new Rooms.Adapter());
     srv.listen(function(){
       var count = 1;
       var c1 = client(srv, primus);
