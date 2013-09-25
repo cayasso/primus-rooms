@@ -678,4 +678,121 @@ describe('primus-rooms', function () {
     });
   });
 
+  it('should trigger `joinroom` event when joining room', function(done){
+    var srv = http();
+    var primus = server(srv, opts);
+    srv.listen(function(){
+      primus.on('connection', function(spark){
+        spark.join('room1');
+        spark.on('joinroom', function (room) {
+          expect(room).to.be.eql('room1');
+          srv.close();
+          done();
+        });
+      });
+      client(srv, primus);
+    });
+  });
+
+  it('should trigger `leaveroom` event when leaving room', function(done){
+    var srv = http();
+    var primus = server(srv, opts);
+    srv.listen(function(){
+      primus.on('connection', function(spark){
+        spark.join('room1', function () {
+          spark.leave('room1');
+          spark.on('leaveroom', function (room) {
+            expect(room).to.be.eql('room1');
+            srv.close();
+            done();
+          });
+        });
+      });
+      client(srv, primus);
+    });
+  });
+
+  it('should trigger `leaveallrooms` events on client disconnect', function(done){
+    this.timeout(0);
+    var srv = http();
+    var primus = server(srv, opts);
+    srv.listen(function(){
+      var c1 = client(srv, primus);
+      primus.on('connection', function(spark){
+        spark.join('a');
+        spark.on('leaveallrooms', function (rooms) {
+          expect(rooms).to.be.eql(['a']);
+          srv.close();
+          done();
+        });
+        spark.write('end');
+      });
+      c1.on('open', function () {
+        c1.on('data', function (data) {
+          if ('end' === data) c1.end();
+        });
+      });
+    });
+  });
+
+  it('should trigger `joinroom` event when joining room using primus join method', function(done){
+    var srv = http();
+    var primus = server(srv, opts);
+    srv.listen(function(){
+      primus.on('connection', function(spark){
+        primus.join(spark, 'room1');
+        primus.on('joinroom', function (room, socket) {
+          expect(room).to.be.eql('room1');
+          expect(spark).to.be.eql(socket);
+          srv.close();
+          done();
+        });
+      });
+      client(srv, primus);
+    });
+  });
+
+  it('should trigger `leaveroom` event when leaving room using primus leave method', function(done){
+    var srv = http();
+    var primus = server(srv, opts);
+    srv.listen(function(){
+      primus.on('connection', function(spark){
+        primus.join(spark, 'room1', function () {
+          primus.leave(spark, 'room1');
+          primus.on('leaveroom', function (room, socket) {
+            expect(room).to.be.eql('room1');
+            expect(spark).to.be.eql(socket);
+            srv.close();
+            done();
+          });
+        });
+      });
+      client(srv, primus);
+    });
+  });
+
+  it('should trigger `leaveallrooms` events on client disconnect when listening on primus', function(done){
+    this.timeout(0);
+    var srv = http();
+    var primus = server(srv, opts);
+    srv.listen(function(){
+      var c1 = client(srv, primus);
+      primus.on('connection', function(spark){
+        primus.join(spark, 'a');
+        primus.on('leaveallrooms', function (rooms, socket) {
+          expect(rooms).to.be.eql(['a']);
+          expect(spark).to.be.eql(socket);
+          srv.close();
+          done();
+        });
+        spark.write('end');
+      });
+      c1.on('open', function () {
+        c1.on('data', function (data) {
+          if ('end' === data) c1.end();
+        });
+      });
+    });
+  });
+
 });

@@ -86,7 +86,7 @@ primus.on('open', function () {
 
 ## API
 
-### primus#adapter(Adapter)
+### primus.adapter(Adapter)
 
 Set your own `adapter` for rooms, by default `primus-rooms` comes 
 with its own `memory` adapter but its easy to provide a custom one.
@@ -100,7 +100,7 @@ primus.use('rooms', Rooms);
 primus.adapter(new MyAdapter());
 ```
 
-### primus#join(spark, name, [fn])
+### primus.join(spark, name, [fn])
 
 Join client to a `room`, `fn` is optional callback.
 
@@ -108,7 +108,7 @@ Join client to a `room`, `fn` is optional callback.
 primus.join(spark, 'room', fn);
 ```
 
-### primus#leave(spark, name, [fn])
+### primus.leave(spark, name, [fn])
 
 Remove client from a specific `room`, `fn` is optional callback.
 
@@ -116,7 +116,7 @@ Remove client from a specific `room`, `fn` is optional callback.
 primus.leave(spark, 'room', fn);
 ```
 
-### primus#room(spark, name, [fn])
+### primus.room(spark, name, [fn])
 
 Target a specific `room` or rooms for broadcasting a message.
 
@@ -130,7 +130,7 @@ primus.room('room').write('hi');
 primus.in('room').write('hi');
 ```
 
-### primus#room#write(message)
+### primus.room(room).write(message)
 
 Send a message to a specific `room`.
 
@@ -143,7 +143,70 @@ or to multiple rooms at once:
 primus.room('sport news art').write('hi');
 ```
 
-### spark#join(name, [fn])
+### primus.room(room).clients([fn])
+
+Get all client `ids` connected to a specific `room`. 
+If no callback is passed the function will return synchronously the ids 
+but please remember that NOT all adapters are guaranteed to be able to do 
+this operation synchronously.
+
+```javascript
+primus.room('room').clients(fn);
+```
+
+or synchronously if adapter supports it:
+
+```javascript
+var clients = primus.room('room').clients();
+console.log(clients);
+```
+
+### primus.on('joinroom')
+
+The `joinroom` event is emitted every time a spark has joined a room. 
+First argument of the callback is the `room` and second argument is the spark.
+
+```javascript
+primus.on('joinroom', function (room, spark) {
+  console.log(spark.id + ' joined ' + room);
+});
+```
+
+### primus.on('leaveroom')
+
+The `leaveroom` event is emitted every time a spark has left a room. 
+First argument of the callback is the `room` and second argument is the spark.
+
+```javascript
+primus.on('leaveroom', function (room, spark) {
+  console.log(spark.id + ' left ' + room);
+});
+```
+
+### primus.on('leaveallrooms')
+
+The `leaveallrooms` event is emitted every time the leaveAll method 
+is called on a spark or when the `end` event is emitted on the client. 
+First argument of the callback is an array with all `rooms` client joined.
+
+```javascript
+primus.on('leaveroom', function (room, spark) {
+  console.log(spark.id + ' leaving all rooms:', room);
+});
+```
+
+### primus.on('roomserror')
+
+The `roomserror` event is emitted every time a spark encounter an error when joining or leaving a room. 
+First argument of the callback is the `error` object and second argument is the spark.
+
+```javascript
+primus.on('roomserror', function (error, spark) {
+  console.log('room error from ' + spark.id, error);
+});
+```
+
+### spark.join(name, [fn])
 
 Join client to a `room`, `fn` is optional callback.
 
@@ -157,7 +220,7 @@ Join multiple rooms at once.
 spark.join('room1 room2 room3', fn);
 ```
 
-### spark#room(name, [fn])
+### spark.room(name, [fn])
 
 Target a specific `room`.
 
@@ -173,7 +236,7 @@ spark.in('room').write('hi');
 spark.in('room').clients(fn);
 ```
 
-### spark#room#write(message)
+### spark.room(room).write(message)
 
 Send a message to a specific `room`.
 
@@ -181,15 +244,25 @@ Send a message to a specific `room`.
 spark.room('room').write('hi');
 ```
 
-### spark#room#clients(fn)
+### spark.room(room).clients([fn])
 
-Get all client `ids` connected to specific `room`.
+Get all client `ids` connected to specific `room`. 
+If no callback is passed the function will return synchronously the ids 
+but please remember that NOT all adapters are guaranteed to be able to do 
+this operation synchronously.
 
 ```javascript
 spark.room('room').clients(fn);
 ```
 
-### sparkt#leave(name, [fn])
+or synchronously if adapter supports it:
+
+```javascript
+var clients = spark.room('room').clients();
+console.log(clients);
+```
+
+### spark.leave(name, [fn])
 
 Leave a specific `room`, `fn` is optional callback.
 
@@ -203,7 +276,7 @@ Leave multiple rooms at once.
 spark.leave('room1 room2 room3', fn);
 ```
 
-### spark#leaveAll()
+### spark.leaveAll()
 
 Leave all rooms the client has joined.
 
@@ -211,12 +284,57 @@ Leave all rooms the client has joined.
 spark.leaveAll();
 ```
 
-### spark#rooms()
+### spark.rooms()
 
 Get all rooms client is connected to.
 
 ```javascript
 spark.rooms();
+```
+
+### spark.on('joinroom')
+
+The `joinroom` event is emitted every time a spark has joined a room. 
+First argument of the callback is the `room`.
+
+```javascript
+spark.on('joinroom', function (room) {
+  console.log(room);
+});
+```
+
+### spark.on('leaveroom')
+
+The `leaveroom` event is emitted every time a spark has left a room. 
+First argument of the callback is the `room`.
+
+```javascript
+spark.on('leaveroom', function (room) {
+  console.log(room);
+});
+```
+
+### spark.on('leaveallrooms')
+
+The `leaveallrooms` event is emitted every time the leaveAll method 
+is called on a spark or when the `end` event is emitted on the client. 
+First argument of the callback is an array with all `rooms` client joined.
+
+```javascript
+spark.on('leaveroom', function (room) {
+  console.log(room);
+});
+```
+
+### spark.on('roomserror')
+
+The `roomserror` event is emitted every time a spark encounter an error when joining or leaving a room. 
+First argument of the callback is the `error` object.
+
+```javascript
+spark.on('roomserror', function (error) {
+  console.log(error);
+});
 ```
 
 ## Run tests
