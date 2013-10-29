@@ -84,16 +84,15 @@ primus.on('open', function () {
 
 ```
 
-Another example where the client can send message to other clients in a room:
+## Client to client
 
-Client
+### Client
 
 ```javascript
-// Client
 primus.write({ room: 'chat', msg: 'Hello some one' });
 ```
 
-Server
+### Server
 
 ```javascript
 primus.on('connection', function(spark){
