@@ -84,6 +84,43 @@ primus.on('open', function () {
 
 ```
 
+Another example where the client can send message to other clients in a room:
+
+Client
+
+```javascript
+// Client
+primus.write({ room: 'chat', msg: 'Hello some one' });
+```
+
+Server
+
+```javascript
+primus.on('connection', function(spark){
+
+  spark.on('data', function(data){
+    var room = data.room;
+    var message = data.msg;
+
+    // check if spark is already in this room
+    if (~spark.rooms().indexOf(room)) {
+      send();
+    } else {
+    // join the room
+    spark.join(room, function(){
+      send();
+    })
+    }
+
+    // send to all clients in the room
+    function send() {
+      spark.room(room).write(message);
+    }
+  })
+
+});
+```
+
 ## API
 
 ### primus.adapter(Adapter)
