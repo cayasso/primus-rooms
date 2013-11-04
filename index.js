@@ -2,18 +2,44 @@
  * Module dependencies.
  */
 
-var PrimusRooms = require('./lib');
+var rooms = require('./lib');
 
 /**
- * Exports modules.
+ * Export `PrimusRooms`.
  */
 
-exports.server = function server(primus, options) {
-  primus.$ = primus.$ || {};
-  primus.$.PrimusRooms = PrimusRooms;
-  PrimusRooms(primus, options);
-};
+module.exports = PrimusRooms;
 
-exports.Adapter = PrimusRooms.Adapter;
-exports.Rooms = PrimusRooms.Rooms;
-exports.PrimusRooms = PrimusRooms;
+/**
+ * Constructor.
+ *
+ * @param {Primus} primus The primus instance.
+ * @api public
+ */
+
+function PrimusRooms(primus, options) {
+  primus.$ = primus.$ || {};
+  primus.$.rooms = {};
+  primus.$.rooms.rooms = rooms;
+  primus.$.rooms.Adapter = rooms.Adapter;
+  primus.$.rooms.Rooms = rooms.Rooms;
+  rooms(primus, options);
+}
+
+/**
+ * Expose server.
+ */
+
+PrimusRooms.server = PrimusRooms;
+
+/**
+ * Expose `Adapter` object.
+ */
+
+PrimusRooms.Adapter = rooms.Adapter;
+
+/**
+ * Expose `Rooms` object.
+ */
+
+PrimusRooms.Rooms = rooms.Rooms;

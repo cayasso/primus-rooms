@@ -27,12 +27,12 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "debug": "0.7.x"    
+    "debug": "0.7.x"
   },
   "devDependencies": {
     "mocha": "*",
     "expect.js": "*",
-    "primus": "1.1.x",
+    "primus": "~1.4.5",
     "ws": "~0.4.27"
   }
 }
