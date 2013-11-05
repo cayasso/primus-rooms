@@ -797,28 +797,51 @@ describe('primus-rooms', function () {
 
   describe('primus-emitter', function (){
 
-    it('should allow sending to a single room from client', function(done){
+    it('should allow sending to single room from client', function(done){
+
       var srv = http();
       var primus = server(srv, opts);
       primus.use('emitter', 'primus-emitter');
+
       srv.listen(function(){
         var c1 = client(srv, primus);
         var c2 = client(srv, primus);
-        var count = 0;
+        var c3 = client(srv, primus);
+
         primus.on('connection', function(spark){
-          spark.join('room1', function () {
-            if (1 === ++count) {
+          spark.on('data', function (room) {
+            if ('broadcast' === room) {
               spark.room('room1').send('news');
+              return;
             }
+            spark.join(room);
           });
         });
+
         c1.on('news', function (data) {
-          done();
+          finish();
         });
 
         c2.on('news', function (data) {
-          done(new Error('not'));
+          finish(new Error('not'));
         });
+
+        c3.on('news', function (data) {
+          finish(new Error('not'));
+        });
+
+        function finish (data) {
+          srv.close();
+          done(data);
+        }
+
+        c1.write('room1');
+        c2.write('room2');
+
+        setTimeout(function () {
+          c3.write('broadcast');
+        }, 100);
+
       });
     });
 
@@ -834,13 +857,14 @@ describe('primus-rooms', function () {
           });
         });
         c1.on('news', function (data) {
+          srv.close();
           done();
         });
       });
     });
 
     it('should allow sending to multiple rooms from client', function(done){
-      this.timeout(0);
+      //this.timeout(0);
       var srv = http();
       var primus = server(srv, opts);
       var total = 2;
@@ -894,7 +918,7 @@ describe('primus-rooms', function () {
     });
 
     it('should allow sending to multiple rooms from server', function(done){
-      this.timeout(0);
+      //this.timeout(0);
       var srv = http();
       var primus = server(srv, opts);
       var total = 2;
