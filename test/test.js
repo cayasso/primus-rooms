@@ -798,84 +798,44 @@ describe('primus-rooms', function () {
   describe('primus-emitter', function (){
 
     it('should allow sending to a single room from client', function(done){
-      this.timeout(0);
       var srv = http();
       var primus = server(srv, opts);
-      var count = 0;
       primus.use('emitter', 'primus-emitter');
-
       srv.listen(function(){
-
         var c1 = client(srv, primus);
         var c2 = client(srv, primus);
-
+        var count = 0;
         primus.on('connection', function(spark){
-          spark.on('join', function (room) {
-            spark.join(room, function () {
-              if (1 === count++) {
-                spark.room('room1').send('news');
-              }
-            });
+          spark.join('room1', function () {
+            if (1 === ++count) {
+              spark.room('room1').send('news');
+            }
           });
         });
-
         c1.on('news', function (data) {
-          finish();
+          done();
         });
 
         c2.on('news', function (data) {
-          finish(new Error('not'));
+          done(new Error('not'));
         });
-
-        function finish (data) {
-          srv.close();
-          done(data);
-        }
-
-        c1.send('join','room1');
-        c2.send('join','room2');
-
       });
     });
 
     it('should allow sending to a single room from server', function(done){
-      this.timeout(0);
       var srv = http();
       var primus = server(srv, opts);
-      var count = 0;
       primus.use('emitter', 'primus-emitter');
-
       srv.listen(function(){
-
         var c1 = client(srv, primus);
-        var c2 = client(srv, primus);
-
         primus.on('connection', function(spark){
-          spark.on('join', function (room) {
-            spark.join(room, function () {
-              if (1 === count++) {
-                primus.room('room1').send('news');
-              }
-            });
+          spark.join('room1', function () {
+            primus.room('room1').send('news');
           });
         });
-
         c1.on('news', function (data) {
-          finish();
+          done();
         });
-
-        c2.on('news', function (data) {
-          finish(new Error('not'));
-        });
-
-        function finish (data) {
-          srv.close();
-          done(data);
-        }
-
-        c1.send('join','room1');
-        c2.send('join','room2');
-
       });
     });
 
