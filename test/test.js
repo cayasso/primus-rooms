@@ -736,5 +736,34 @@ describe('primus-rooms', function () {
       c3.send('join','room3');
       c4.send('join','room4');
     });
+
+    it('should allow sending to all clients from server', function(done){
+      primus.use('emitter', 'primus-emitter');
+      var count = 0;
+      var c1 = createClient();
+      var c2 = createClient();
+      var c3 = createClient();
+      var spy1 = sinon.spy();
+      var spy2 = sinon.spy();
+      var spy3 = sinon.spy();
+
+      primus.on('connection', function(spark){
+        ++count;
+        spark.join('room' + count);
+        if (3 === count) {
+          primus.send('news');
+          setTimeout(function() {
+            expect(spy1.callCount).to.be(1);
+            expect(spy2.callCount).to.be(1);
+            expect(spy3.callCount).to.be(1);
+            done();
+          }, timeout);
+        }
+      });
+
+      c1.on('news', spy1);
+      c2.on('news', spy2);
+      c3.on('news', spy3);
+    });
   });
 });
