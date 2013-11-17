@@ -34,6 +34,7 @@
     "expect.js": "*",
     "primus": "~1.4.5",
     "ws": "~0.4.27",
-    "primus-emitter": "~2.0.x"
+    "primus-emitter": "~2.0.x",
+    "sinon": "~1.7.3"
   }
 }
