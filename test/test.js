@@ -206,12 +206,16 @@ describe('primus-rooms', function () {
     var spy2 = sinon.spy();
     var spy3 = sinon.spy();
     var stub = sinon.stub().throws(new Error('Should not get message'));
+    var id;
 
     primus.on('connection', function(spark){
       spark.on('data', function (data) {
+        if (data === 'room4') id = spark.id;
         spark.join(data, function () {
           ++count;
           if (4 === count) {
+            // Make sure we use c4 connection for the test
+            spark = primus.connections[id];
             spark.room('room1 room2 room3').write('a');
             setTimeout(function() {
               expect(spy1.callCount).to.be(1);
@@ -610,6 +614,37 @@ describe('primus-rooms', function () {
     });
   });
 
+  it('should still support broadcasting from server with `write`', function(done){
+      primus.use('emitter', 'primus-emitter');
+      var count = 0;
+      var c1 = createClient();
+      var c2 = createClient();
+      var c3 = createClient();
+      var spy1 = sinon.spy();
+      var spy2 = sinon.spy();
+      var spy3 = sinon.spy();
+
+      primus.on('connection', function(spark){
+        ++count;
+        if (3 === count) {
+          primus.write('hi');
+          setTimeout(function() {
+            expect(spy1.callCount).to.be(1);
+            expect(spy1.calledWith('hi')).to.be(true);
+            expect(spy2.callCount).to.be(1);
+            expect(spy2.calledWith('hi')).to.be(true);
+            expect(spy3.callCount).to.be(1);
+            expect(spy3.calledWith('hi')).to.be(true);
+            done();
+          }, timeout);
+        }
+      });
+
+      c1.on('data', spy1);
+      c2.on('data', spy2);
+      c3.on('data', spy3);
+    });
+
   describe('primus-emitter', function (){
 
     it('should allow sending to single room from client', function(done){
@@ -641,7 +676,9 @@ describe('primus-rooms', function () {
 
       c1.write('room1');
       c2.write('room2');
-      c3.write('broadcast');
+      setTimeout(function() {
+        c3.write('broadcast');
+      }, timeout);
     });
 
     it('should allow sending to a single room from server', function(done){
@@ -668,12 +705,16 @@ describe('primus-rooms', function () {
       var spy2 = sinon.spy();
       var spy3 = sinon.spy();
       var stub = sinon.stub().throws(new Error('Should not get message'));
+      var id;
 
       primus.on('connection', function(spark){
         spark.on('join', function (room) {
+          if (room === 'room4') id = spark.id;
           spark.join(room, function () {
             ++count;
             if (4 === count) {
+              // Make sure we use c4 connection for the test
+              spark = primus.connections[id];
               spark.room('room1 room2 room3').send('news');
               setTimeout(function() {
                 expect(spy1.callCount).to.be(1);
@@ -737,7 +778,7 @@ describe('primus-rooms', function () {
       c4.send('join','room4');
     });
 
-    it('should allow sending to all clients from server', function(done){
+    it('should still support broadcasting from server with primus-emitter `send`', function(done){
       primus.use('emitter', 'primus-emitter');
       var count = 0;
       var c1 = createClient();
@@ -749,13 +790,15 @@ describe('primus-rooms', function () {
 
       primus.on('connection', function(spark){
         ++count;
-        spark.join('room' + count);
         if (3 === count) {
-          primus.send('news');
+          primus.send('news', 'hi');
           setTimeout(function() {
             expect(spy1.callCount).to.be(1);
+            expect(spy1.calledWith('hi')).to.be(true);
             expect(spy2.callCount).to.be(1);
+            expect(spy2.calledWith('hi')).to.be(true);
             expect(spy3.callCount).to.be(1);
+            expect(spy3.calledWith('hi')).to.be(true);
             done();
           }, timeout);
         }
