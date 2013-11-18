@@ -795,6 +795,39 @@ describe('primus-rooms', function () {
     });
   });
 
+  it('should still support broadcasting from server with `write`', function(done){
+    var srv = http();
+    var primus = server(srv, opts);
+    var total = 0;
+    srv.listen(function(){
+      primus.on('connection', function(spark){
+        if (3 === ++total) primus.write('hi');
+      });
+      var cl1 = client(srv, primus);
+      var cl2 = client(srv, primus);
+      var cl3 = client(srv, primus);
+
+      cl1.on('data', function (msg) {
+        expect(msg).to.be('hi');
+        finish();
+      });
+
+      cl2.on('data', function (msg) {
+        expect(msg).to.be('hi');
+        finish();
+      });
+
+      cl3.on('data', function (msg) {
+        expect(msg).to.be('hi');
+        finish();
+      });
+
+      function finish() {
+        if (1 < --total) done();
+      }
+    });
+  });
+
   describe('primus-emitter', function (){
 
     it('should allow sending to single room from client', function(done){
@@ -971,7 +1004,7 @@ describe('primus-rooms', function () {
       });
     });
 
-    it('should still support broadcasting from server', function(done){
+    it('should still support broadcasting from server with primus-emitter `send`', function(done){
       var srv = http();
       var primus = server(srv, opts);
       var total = 0;
