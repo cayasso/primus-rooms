@@ -970,5 +970,41 @@ describe('primus-rooms', function () {
 
       });
     });
+
+    it('should still support broadcasting from server', function(done){
+      var srv = http();
+      var primus = server(srv, opts);
+      var total = 0;
+
+      primus.use('emitter', 'primus-emitter');
+
+      srv.listen(function(){
+        primus.on('connection', function(spark){
+          if (3 === ++total) primus.send('news', 'hi');
+        });
+        var cl1 = client(srv, primus);
+        var cl2 = client(srv, primus);
+        var cl3 = client(srv, primus);
+
+        cl1.on('news', function (msg) {
+          expect(msg).to.be('hi');
+          finish();
+        });
+
+        cl2.on('news', function (msg) {
+          expect(msg).to.be('hi');
+          finish();
+        });
+
+        cl3.on('news', function (msg) {
+          expect(msg).to.be('hi');
+          finish();
+        });
+
+        function finish() {
+          if (1 < --total) done();
+        }
+      });
+    });
   });
 });
