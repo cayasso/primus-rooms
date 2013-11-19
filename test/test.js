@@ -381,11 +381,11 @@ describe('primus-rooms', function () {
   it('should allow passing adapter as argument', function (done) {
 
     opts.adapter = {
-      add: function (){},
-      del: function (){},
-      delAll: function (){},
-      broadcast: function (){},
-      clients: function (){}
+      add: function () {},
+      del: function () {},
+      delAll: function () {},
+      broadcast: function () {},
+      clients: function () {}
     };
 
     primus = server(srv, opts);
@@ -398,11 +398,11 @@ describe('primus-rooms', function () {
 
   it('should allow setting and getting adapter', function (done) {
     var adapter = {
-      add: function (){},
-      del: function (){},
-      delAll: function (){},
-      broadcast: function (){},
-      clients: function (){}
+      add: function () {},
+      del: function () {},
+      delAll: function () {},
+      broadcast: function () {},
+      clients: function () {}
     };
     primus = server(srv, opts);
     srv.listen(function () {
@@ -467,7 +467,7 @@ describe('primus-rooms', function () {
       primus.on('connection', function (spark) {
         ids.push(spark.id);
         primus.join(spark, 'room1');
-        spark.on('data', function (){
+        spark.on('data', function () {
           primus.room('room1').clients(function (err, clients) {
             expect(clients).to.be.eql(ids);
             done();
@@ -491,7 +491,7 @@ describe('primus-rooms', function () {
       primus.on('connection', function (spark) {
         ids.push(spark.id);
         primus.join(spark, 'room1');
-        spark.on('data', function (){
+        spark.on('data', function () {
           var clients = primus.in('room1').clients();
           expect(clients).to.be.eql(ids);
           done();
@@ -763,7 +763,7 @@ describe('primus-rooms', function () {
     });
   });
 
-  describe('primus-emitter', function (){
+  describe('primus-emitter', function () {
 
     it('should allow sending to specific room from client', function (done) {
       
