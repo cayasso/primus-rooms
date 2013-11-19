@@ -383,6 +383,7 @@ $ make test
 
  * [primus-multiplex](https://github.com/cayasso/primus-multiplex)
  * [primus-emitter](https://github.com/cayasso/primus-emitter)
+ * [primus-resource](https://github.com/cayasso/primus-resource)
 
 ## License
 
