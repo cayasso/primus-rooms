@@ -1025,64 +1025,6 @@ describe('primus-rooms', function () {
         }
       });
     });
-
-    it('should work on lazy loading `primus-emitter`', function (done) {
-
-      var total = 0;
-
-      function lazyLoad() {
-        primus.use('emitter', 'primus-emitter');
-
-        var c1 = client(srv, primus)
-          , c2 = client(srv, primus)
-          , c3 = client(srv, primus)
-          , c4 = client(srv, primus);
-
-        c1.on('msg', function (msg) {
-          expect(msg).to.be('hi');
-          finish();
-        });
-
-        c2.on('msg', function (msg) {
-          expect(msg).to.be('hi');
-          finish();
-        });
-
-        c3.on('msg', function (msg) {
-          expect(msg).to.be('hi');
-          finish();
-        });
-
-        c4.on('msg', function (msg) {
-          done(new Error('not'));
-        });
-
-        function finish() {
-          if (1 > --total) done();
-        }
-
-        c1.send('join','room1');
-        c2.send('join','room2');
-        c3.send('join','room3');
-        c4.send('join','room4');
-      }
-
-      srv.listen(function () {
-        primus.on('connection', function (spark) {
-          spark.on('join', function (room) {
-            spark.join(room, function () {
-              if (4 === ++total) {
-                --total;
-                primus.room('room1 room2 room3').send('msg', 'hi');
-              }
-            });
-          });
-        });
-      });
-
-      setTimeout(lazyLoad, 200);
-
-    });
   });
 
   describe('primus-multiplex', function () {
