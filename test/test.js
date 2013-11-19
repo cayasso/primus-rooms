@@ -1,6 +1,6 @@
 'use strict';
 
-var Rooms = require('../')
+var rooms = require('../')
   , Primus = require('primus')
   , http = require('http').Server
   , expect = require('expect.js')
@@ -17,7 +17,7 @@ function client(srv, primus, port){
 // creates the server
 function server(srv, opts) {
   return Primus(srv, opts)
-    .use('rooms', Rooms);
+    .use('rooms', rooms);
 }
 
 describe('primus-rooms', function () {
