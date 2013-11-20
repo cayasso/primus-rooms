@@ -264,11 +264,11 @@ describe('primus-rooms', function () {
       });
 
       c4.on('data', function (msg) {
-        finish(new Error('not'));
+        done(new Error('not'));
       });
 
-      function finish (error) {
-        if (1 > --total) done(error);
+      function finish () {
+        if (1 > --total) done();
       }
       
       c1.write('room1');
@@ -309,8 +309,8 @@ describe('primus-rooms', function () {
         finish();
       });
 
-      function finish (error) {
-        if (1 > --total) done(error);
+      function finish () {
+        if (1 > --total) done();
       }
 
       setTimeout(function() {
@@ -538,7 +538,7 @@ describe('primus-rooms', function () {
     });
   });
 
-  it('should broadcast message to specific room from primus usin `room`', function (done) {
+  it('should broadcast message to specific room from primus using `room`', function (done) {
     
     var total = 0;
 
@@ -574,17 +574,17 @@ describe('primus-rooms', function () {
       });
 
       c3.on('data', function (msg) {
-        finish(new Error('not'));
+        done(new Error('not'));
       });
 
-      function finish (error) {
-        if (1 > --total) done(error);
+      function finish () {
+        if (1 > --total) done();
       }
       
     });
   });
 
-  it('should broadcast message to multiple rooms from primus usin `room` method', function (done) {
+  it('should broadcast message to multiple rooms from primus using `room` method', function (done) {
     
     var total = 0;
 
@@ -620,11 +620,11 @@ describe('primus-rooms', function () {
       });
 
       c3.on('data', function (msg) {
-        finish(new Error('not'));
+        done(new Error('not'));
       });
 
-      function finish (error) {
-        if (1 > --total) done(error);
+      function finish () {
+        if (1 > --total) done();
       }
       
     });
@@ -851,11 +851,11 @@ describe('primus-rooms', function () {
         });
 
         c4.on('msg', function (msg) {
-          finish(new Error('not'));
+          done(new Error('not'));
         });
 
-        function finish(error) {
-          if (1 > --total) done(error);
+        function finish() {
+          if (1 > --total) done();
         }
 
         c1.send('join', 'room1');
@@ -923,11 +923,11 @@ describe('primus-rooms', function () {
         });
 
         c4.on('msg', function (msg) {
-          finish(new Error('not'));
+          done(new Error('not'));
         });
 
-        function finish(error) {
-          if (1 > --total) done(error);
+        function finish() {
+          if (1 > --total) done();
         }
 
         c1.send('join','room1');
@@ -973,11 +973,11 @@ describe('primus-rooms', function () {
         });
 
         c4.on('data', function (msg) {
-          finish(new Error('not'));
+          done(new Error('not'));
         });
 
-        function finish(error) {
-          if (1 > --total) done(error);
+        function finish() {
+          if (1 > --total) done();
         }
 
         c1.write('room1');
@@ -1024,64 +1024,6 @@ describe('primus-rooms', function () {
           if (1 > --total) done();
         }
       });
-    });
-
-    it('should work on lazy loading `primus-emitter`', function (done) {
-
-      var total = 0;
-
-      function lazyLoad() {
-        primus.use('emitter', 'primus-emitter');
-
-        var c1 = client(srv, primus)
-          , c2 = client(srv, primus)
-          , c3 = client(srv, primus)
-          , c4 = client(srv, primus);
-
-        c1.on('msg', function (msg) {
-          expect(msg).to.be('hi');
-          finish();
-        });
-
-        c2.on('msg', function (msg) {
-          expect(msg).to.be('hi');
-          finish();
-        });
-
-        c3.on('msg', function (msg) {
-          expect(msg).to.be('hi');
-          finish();
-        });
-
-        c4.on('msg', function (msg) {
-          finish(new Error('not'));
-        });
-
-        function finish(error) {
-          if (1 > --total) done(error);
-        }
-
-        c1.send('join','room1');
-        c2.send('join','room2');
-        c3.send('join','room3');
-        c4.send('join','room4');
-      }
-
-      srv.listen(function () {
-        primus.on('connection', function (spark) {
-          spark.on('join', function (room) {
-            spark.join(room, function () {
-              if (4 === ++total) {
-                --total;
-                primus.room('room1 room2 room3').send('msg', 'hi');
-              }
-            });
-          });
-        });
-      });
-
-      setTimeout(lazyLoad, 200);
-
     });
   });
 
@@ -1186,11 +1128,11 @@ describe('primus-rooms', function () {
       });
 
       c4a.on('data', function (msg) {
-        finish(new Error('not'));
+        done(new Error('not'));
       });
 
-      function finish(error) {
-        if (1 > --total) done(error);
+      function finish() {
+        if (1 > --total) done();
       }
 
       setTimeout(function () {
@@ -1241,11 +1183,11 @@ describe('primus-rooms', function () {
       });
 
       c4a.on('data', function (msg) {
-        finish(new Error('not'));
+        done(new Error('not'));
       });
 
-      function finish(error) {
-        if (1 > --total) done(error);
+      function finish() {
+        if (1 > --total) done();
       }
 
       setTimeout(function () {
@@ -1299,11 +1241,11 @@ describe('primus-rooms', function () {
       });
 
       c4a.on('msg', function (msg) {
-        finish(new Error('not'));
+        done(new Error('not'));
       });
 
-      function finish(error) {
-        if (1 > --total) done(error);
+      function finish() {
+        if (1 > --total) done();
       }
 
       setTimeout(function () {
@@ -1396,11 +1338,11 @@ describe('primus-rooms', function () {
       });
 
       c4a.on('msg', function (msg) {
-        finish(new Error('not'));
+        done(new Error('not'));
       });
 
-      function finish(error) {
-        if (1 > --total) done(error);
+      function finish() {
+        if (1 > --total) done();
       }
 
       setTimeout(function () {
