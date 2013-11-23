@@ -937,6 +937,12 @@ describe('primus-rooms', function () {
       });
     });
 
+    it('should return Primus instance when sending to a room from server', function() {
+      primus.use('emitter', 'primus-emitter');
+      expect(primus.room('room1').send('news')).to.be.a(Primus);
+      srv.listen();
+    });
+
     it('should allow sending to multiple rooms from server with `write`', function (done) {
       var total = 0;
       primus.use('emitter', 'primus-emitter');
