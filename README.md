@@ -295,6 +295,13 @@ var except = ['1386018854525$0', '1386018854526$1'];
 spark.room('room').except(except).write('hi');
 ```
 
+this method will also work from the server:
+
+```javascript
+var except = ['1386018854525$0', '1386018854526$1'];
+primus.in('room').except(except).write('hi');
+```
+
 ### spark.room(room).clients([fn])
 
 Get all client `ids` connected to specific `room`. 
