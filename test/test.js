@@ -383,6 +383,59 @@ describe('primus-rooms', function () {
     });
   });
 
+  it('should allow defining exception ids when broadcasting from server', function (done) {
+    
+    var total = 0
+      , sender
+      , except = [];
+
+    srv.listen(function () {
+      primus.on('connection', function (spark) {
+        spark.on('data', function (data) {
+          if (/room1|room3/.test(data)) {
+            except.push(spark.id);
+          }          
+          if ('send' === data) {
+            sender = spark;
+          }
+          spark.join(data, function () {
+            if (4 === ++total) {
+              --total;
+              primus.in('room1 room2 room3').except(except).write('hi');
+            }
+          });
+        });
+      });
+
+      var c1 = client(srv, primus)
+        , c2 = client(srv, primus)
+        , c3 = client(srv, primus)
+        , c4 = client(srv, primus);
+
+      c1.on('data', function (msg) {
+        done(new Error('not'));
+      });
+
+      c2.on('data', function (msg) {
+        expect(msg).to.be('hi');
+        done();
+      });
+
+      c3.on('data', function (msg) {
+        done(new Error('not'));
+      });
+
+      c4.on('data', function (msg) {
+        done(new Error('not'));
+      });
+      
+      c1.write('room1');
+      c2.write('room2');
+      c3.write('room3');
+      c4.write('send');
+    });
+  });
+
   it('should avoid sending dupes', function (done) {
 
     var total = 2;
