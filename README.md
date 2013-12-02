@@ -280,6 +280,21 @@ Send a message to a specific `room`.
 spark.room('room').write('hi');
 ```
 
+### spark.room(name).except(ids);
+
+Broadcast messages to clients in a room except to those especified.
+
+```javascript
+spark.room('room').except('1386018854525$0 1386018854526$1').write('hi');
+```
+
+or pass an array:
+
+```javascript
+var except = ['1386018854525$0', '1386018854526$1'];
+spark.room('room').except(except).write('hi');
+```
+
 ### spark.room(room).clients([fn])
 
 Get all client `ids` connected to specific `room`. 
@@ -326,6 +341,20 @@ Get all rooms client is connected to.
 
 ```javascript
 spark.rooms();
+```
+
+### spark.isRoomEmpty([room])
+
+Check to see if a room is empty.
+
+```javascript
+spark.isRoomEmpty('sport');
+```
+
+or you can also use it like this:
+
+```javascript
+spark.room('sport').isRoomEmpty();
 ```
 
 ### spark.on('joinroom')
