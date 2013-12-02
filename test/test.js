@@ -883,6 +883,24 @@ describe('primus-rooms', function () {
       });
     });
 
+    it('should not allow broadcasting message with ack', function (done) {
+      primus.use('emitter', 'primus-emitter');
+      srv.listen(function () {
+        var c1 = client(srv, primus);
+        primus.on('connection', function (spark) {
+          spark.join('room1', function () {
+            expect(function () {
+              primus.room('room1').send('news', function(){});
+            }).to.throwException(/Callbacks are not supported/);
+            done();
+          });
+        });
+        c1.on('news', function (data) {
+          done();
+        });
+      });
+    });
+
     it('should allow sending to multiple rooms from server', function (done) {
 
       var total = 0;
