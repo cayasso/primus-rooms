@@ -465,6 +465,30 @@ describe('primus-rooms', function () {
     });
   });
 
+  it('should check if a room is empty', function (done) {
+    var sparks = [];
+    srv.listen(function () {
+      primus.on('connection', function (spark) {
+        spark.join('room1', function () {
+          sparks.push(spark);
+        });
+        spark.on('data', function () {
+          sparks.forEach(function (s) {
+            expect(s.isRoomEmpty('room1')).to.be.eql(false);
+            s.leaveAll();
+          });
+          expect(spark.room('room1').isRoomEmpty()).to.be.eql(true);
+          done();
+        });
+      });
+      client(srv, primus);
+      client(srv, primus);
+      client(srv, primus);
+      client(srv, primus)
+      .write('send');
+    });
+  });
+
   it('should keeps track of rooms', function (done) {
     srv.listen(function () {
       var conn = client(srv, primus);
