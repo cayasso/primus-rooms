@@ -196,6 +196,19 @@ or synchronously if adapter supports it:
 var clients = primus.room('room').clients();
 console.log(clients);
 ```
+### primus.rooms([spark])
+
+Get all active rooms on the server.
+
+```javascript
+primus.rooms();
+```
+
+Get all rooms a specific spark is connected to.
+
+```javascript
+primus.rooms(spark, fn);
+```
 
 ### primus.on('joinroom')
 
