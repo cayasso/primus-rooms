@@ -584,6 +584,51 @@ describe('primus-rooms', function () {
     });
   });
 
+  it('should return all rooms on server', function (done) {
+    srv.listen(function () {
+      var conn = client(srv, primus);
+      primus.on('connection', function (spark) {
+        spark.join('a', function () {
+          spark.join('b', function () {
+            spark.leave('c', function () {
+              expect(primus.rooms()).to.eql(['a', 'b']);
+              done();
+            });
+          });
+        });
+      });
+    });
+  });
+
+  it('should return all rooms of specific client from server', function (done) {
+    srv.listen(function () {
+      var first = true;
+      primus.on('connection', function (spark) {
+        if (first) {
+          spark.join('a', function () {
+            spark.join('b', function () {
+              spark.leave('c', function () {
+                expect(primus.rooms(spark)).to.eql(['a', 'b']);
+                client(srv, primus);
+              });
+            });
+          });
+          first = false;
+        } else {
+          spark.join('d', function () {
+            spark.join('e', function () {
+              spark.leave('f', function () {
+                expect(primus.rooms(spark)).to.eql(['d', 'e']);
+                done();
+              });
+            });
+          });
+        }
+      });
+      client(srv, primus);
+    });
+  });
+
   it('should allow passing adapter as argument', function (done) {
 
     opts.adapter = {
