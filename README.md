@@ -179,6 +179,21 @@ or to multiple rooms at once:
 primus.room('sport news art').write('hi');
 ```
 
+### primus.room(name).except(ids);
+
+Broadcast messages to clients in a room except to those especified.
+
+```javascript
+primus.room('room').except('1386018854525$0 1386018854526$1').write('hi');
+```
+
+or pass an array:
+
+```javascript
+var except = ['1386018854525$0', '1386018854526$1'];
+primus.room('room').except(except).write('hi');
+```
+
 ### primus.room(room).clients([fn])
 
 Get all client `ids` connected to a specific `room`. 
@@ -306,13 +321,6 @@ or pass an array:
 ```javascript
 var except = ['1386018854525$0', '1386018854526$1'];
 spark.room('room').except(except).write('hi');
-```
-
-this method will also work from the server:
-
-```javascript
-var except = ['1386018854525$0', '1386018854526$1'];
-primus.in('room').except(except).write('hi');
 ```
 
 ### spark.room(room).clients([fn])
