@@ -236,7 +236,6 @@ describe('primus-rooms', function () {
           }
           spark.join(data, function () {
             if (4 === ++total) {
-              --total;
               sender.room('room1 room2 room3').write('hi');
             }
           });
