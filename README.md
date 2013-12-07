@@ -254,7 +254,7 @@ is called on a spark or when the `end` event is emitted on the client.
 First argument of the callback is an array with all `rooms` client joined.
 
 ```javascript
-primus.on('leaveroom', function (room, spark) {
+primus.on('leaveallrooms', function (room, spark) {
   console.log(spark.id + ' leaving all rooms:', room);
 });
 ```
