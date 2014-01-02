@@ -14,13 +14,7 @@
 
         var primus = new Primus.connect('ws://localhost:8080');
 
-        primus.on('data', function (msg) {
-          console.log('MESSAGE ===>', msg);
-        });
-
-        /*primus.on('open', function () {
-
-          console.log('OPENED');
+        primus.on('open', function () {
 
           // Send request to join the news room
           primus.write(room);
@@ -35,7 +29,7 @@
         // on data received
         primus.on('data', function (data) {
           console.log('MSG:', data);
-        });*/
+        });
       }
 
       // Set one more client
@@ -43,17 +37,17 @@
 
 
       // Set one more client
-      //client('room2');
+      client('room2');
 
 
       // Set one more client
-      //client('room3');
+      client('room3');
 
       // Set one more client
-      //client('room4');
+      client('room4');
 
       // special client
-      //client('me');
+      client('me');
 
 
     </script>
