@@ -476,6 +476,32 @@ describe('primus-rooms', function () {
     });
   });
 
+  it('should not allow broadcasting from a destroyed spark', function (done) {
+    srv.listen(function () {
+      
+      primus.on('connection', function (spark) {
+        spark.join('room1');
+      });
+      
+      primus.on('disconnection', function (spark) {
+        spark.room('room1').write('hola');
+        done();
+      });
+
+      var c1 = client(srv, primus);
+      
+      c1.on('open', function () {
+        var c2 = client(srv, primus);
+        c2.on('open', c2.end);
+      });
+
+      c1.on('data', function () {
+        done(new Error('not'));
+      });
+      
+    });
+  });
+
   it('should get all clients connected to a room', function (done) {
     var ids = [];
     srv.listen(function () {

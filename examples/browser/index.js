@@ -15,13 +15,40 @@ var primus = new Primus(server, { transformer: 'websockets', parser: 'JSON' });
 
 
 // add rooms to Primus
-primus.use('rooms', rooms);
+//primus.use('rooms', rooms);
+//primus.use('emitter', 'primus-emitter');
 
 var timer = null;
 
 primus.on('connection', function (spark) {
 
-  spark.on('data', function (room) {
+
+
+  //spark.join('hola1');
+  /*spark.join('hola2');
+  spark.join('hola3');
+  spark.join('hola4');
+  spark.join('hola5');
+  spark.join('hola6');
+  spark.join('hola7');
+  spark.join('hola8');
+  spark.join('hola9');
+  spark.join('hola10');
+  spark.join('hola11');
+  spark.join('hola12');
+  spark.join('hola13');
+  spark.join('hola14');
+  spark.join('hola15');*/
+
+
+  setInterval(function () {
+    spark.write('DATA IN THE HOUSE ' + spark.id);
+    //spark.room('hola1').write('hola');
+  }, 5000);
+  
+
+
+  /*spark.on('data', function (room) {
 
     if ('me' === room) {
 
@@ -54,12 +81,12 @@ primus.on('connection', function (spark) {
     // leaving room room2
     spark.leave('room2');
 
-  });
+  });*/
 
 });
 
 
 // Start server listening
 server.listen(process.env.PORT || 8080, function(){
-  console.log('\033[96mlistening on localhost:8081 \033[39m');
+  console.log('\033[96mlistening on localhost:8080 \033[39m');
 });
