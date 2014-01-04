@@ -211,6 +211,28 @@ or synchronously if adapter supports it:
 var clients = primus.room('room').clients();
 console.log(clients);
 ```
+
+### primus.room(room).empty()
+
+Remove all clients from a `room` or multiple `room`s.
+
+```javascript
+primus.room('sport').empty();
+
+// or
+
+primus.empty('sport');
+```
+
+or multiple rooms at the same time:
+
+```javascript
+primus.room('news sport').empty();
+
+// or
+primus.empty('news sport');
+```
+
 ### primus.rooms([spark])
 
 Get all active rooms on the server.
