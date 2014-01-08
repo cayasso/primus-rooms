@@ -136,20 +136,78 @@ primus.use('rooms', Rooms);
 primus.adapter(new MyAdapter());
 ```
 
-### primus.join(spark, name, [fn])
+### primus.join(sparks, name, [fn])
 
-Join client to a `room`, `fn` is optional callback.
+Join multiple sparks to a `room` or multiple rooms, `fn` is optional callback.
 
 ```javascript
-primus.join(spark, 'room', fn);
+primus.join([spark1, spark2, spark3], 'news', fn);
+
+// to multiple rooms
+primus.join([spark1, spark2, spark3], 'news sport', fn);
 ```
 
-### primus.leave(spark, name, [fn])
-
-Remove client from a specific `room`, `fn` is optional callback.
+Join multiple sparks to a `room` or multiple rooms by passing spark ids.
 
 ```javascript
-primus.leave(spark, 'room', fn);
+primus.join(['1389028863093$0', '1389028862534$1', '1389028862896$3'], 'news', fn);
+
+// to multiple rooms
+primus.join(['1389028863093$0', '1389028862534$1', '1389028862896$3'], 'news sport', fn);
+```
+
+You can also mix ids with instances in the array:
+
+```javascript
+primus.join([spark1, spark2, '1389028862896$3'], 'news', fn);
+```
+
+You can also pass a single spark instance or id to join a room or multiple rooms:
+
+```javascript
+primus.join(spark, 'news', fn);
+```
+This is also equivalent:
+
+```javascript
+primus.join('1389028863093$0', 'news', fn);
+```
+
+### primus.leave(sparks, name, [fn])
+
+Remove multiple sparks from a `room` or multiple rooms, `fn` is optional callback.
+
+```javascript
+primus.leave([spark1, spark2, spark3], 'news', fn);
+
+// multiple rooms
+primus.leave([spark1, spark2, spark3], 'news sport', fn);
+```
+
+Remove multiple sparks from a `room` or multiple rooms by passing spark ids.
+
+```javascript
+primus.leave(['1389028863093$0', '1389028862534$1', '1389028862896$3'], 'news', fn);
+
+// multiple rooms
+primus.leave(['1389028863093$0', '1389028862534$1', '1389028862896$3'], 'news sport', fn);
+```
+
+You can also mix ids with instances in the array:
+
+```javascript
+primus.leave([spark1, spark2, '1389028862896$3'], 'news', fn);
+```
+
+You can also pass a single spark instance or id to leave a room or multiple rooms:
+
+```javascript
+primus.leave(spark, 'news', fn);
+```
+This is also equivalent:
+
+```javascript
+primus.leave('1389028863093$0', 'news', fn);
 ```
 
 ### primus.room(spark, name, [fn])
