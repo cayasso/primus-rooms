@@ -401,10 +401,18 @@ Check to see if a room is empty.
 spark.isRoomEmpty('sport');
 ```
 
-or you can also use it like this:
+or you can also use it like bellow but can only pass one room,
+multiple rooms will are not supported:
 
 ```javascript
 spark.room('sport').isRoomEmpty();
+```
+
+This is not supported, you will get incorrect results.
+
+```javascript
+// wrong
+spark.room('sport news').isRoomEmpty();
 ```
 
 ### spark.on('joinroom')

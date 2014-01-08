@@ -60,7 +60,7 @@ describe('primus-rooms', function () {
       client(srv, primus);
     });
   });
-  
+    
   it('should join multiple rooms at once', function (done) {
     srv.listen(function () {
       primus.on('connection', function (spark) {
@@ -555,7 +555,7 @@ describe('primus-rooms', function () {
             expect(s.isRoomEmpty('room1')).to.be.eql(false);
             s.leaveAll();
           });
-          expect(spark.room('room1').isRoomEmpty()).to.be.eql(true);
+          expect(spark.isRoomEmpty('room1')).to.be.eql(true);
           done();
         });
       });
@@ -579,7 +579,7 @@ describe('primus-rooms', function () {
             expect(primus.isRoomEmpty('room1')).to.be.eql(false);
             s.leaveAll();
           });
-          expect(primus.in('room1').isRoomEmpty()).to.be.eql(true);
+          expect(primus.isRoomEmpty('room1')).to.be.eql(true);
           done();
         });
       });
@@ -600,7 +600,7 @@ describe('primus-rooms', function () {
 
         spark.on('data', function () {
           primus.empty('room1');
-          expect(primus.in('room1').isRoomEmpty()).to.be.eql(true);
+          expect(primus.isRoomEmpty('room1')).to.be.eql(true);
           done();
         });
       });
@@ -622,7 +622,7 @@ describe('primus-rooms', function () {
 
         spark.on('data', function () {
           primus.in('room1 room2 room3').empty();
-          expect(primus.in('room1').isRoomEmpty()).to.be.eql(true);
+          expect(primus.isRoomEmpty('room1')).to.be.eql(true);
           done();
         });
       });
@@ -825,7 +825,6 @@ describe('primus-rooms', function () {
   });
 
   it('should join spark to a room using primus method', function (done) {
-
     srv.listen(function () {
       primus.on('connection', function (spark) {
         primus.join(spark, 'room1', function () {
@@ -840,7 +839,46 @@ describe('primus-rooms', function () {
     });
   });
 
-  it('should remove spark form room using primus method', function (done) {
+  it('should join spark to a room by spark id on from primus', function (done) {
+    srv.listen(function () {
+      primus.on('connection', function (spark) {
+        primus.join(spark.id, 'room1');
+        spark.room('room1').clients(function (err, clients) {
+          expect(!!~clients.indexOf(spark.id)).to.eql(true);
+          done();
+        });
+      });
+      client(srv, primus);
+    });
+  });
+
+  it('should join spark to a room with array of ids from primus', function (done) {
+    srv.listen(function () {
+      primus.on('connection', function (spark) {
+        primus.join([spark.id], 'room1');
+        spark.room('room1').clients(function (err, clients) {
+          expect(!!~clients.indexOf(spark.id)).to.eql(true);
+          done();
+        });
+      });
+      client(srv, primus);
+    });
+  });
+
+  it('should join spark to a room with array of spark instances from primus', function (done) {
+    srv.listen(function () {
+      primus.on('connection', function (spark) {
+        primus.join([spark], 'room1');
+        spark.room('room1').clients(function (err, clients) {
+          expect(!!~clients.indexOf(spark.id)).to.eql(true);
+          done();
+        });
+      });
+      client(srv, primus);
+    });
+  });
+
+  it('should remove spark from room using primus method', function (done) {
     srv.listen(function () {
       primus.on('connection', function (spark) {
         primus.join(spark, 'room1', function () {
@@ -852,6 +890,101 @@ describe('primus-rooms', function () {
           });
         });
       });
+      client(srv, primus);
+    });
+  });
+
+  it('should remove spark from room by passing spark id, from primus', function (done) {
+    srv.listen(function () {
+      primus.on('connection', function (spark) {
+        primus.join(spark, 'room1', function () {
+          primus.leave(spark.id, 'room1', function () {
+            spark.room('room1').clients(function (err, clients) {
+              expect(!!~clients.indexOf(spark.id)).to.eql(false);
+              done();
+            });
+          });
+        });
+      });
+      client(srv, primus);
+    });
+  });
+
+  it('should remove spark from room by passing array of instances, from primus', function (done) {
+    srv.listen(function () {
+      primus.on('connection', function (spark) {
+        primus.join(spark, 'room1', function () {
+          primus.leave([spark], 'room1', function () {
+            spark.room('room1').clients(function (err, clients) {
+              expect(!!~clients.indexOf(spark.id)).to.eql(false);
+              done();
+            });
+          });
+        });
+      });
+      client(srv, primus);
+    });
+  });
+
+  it('should remove spark from room by passing array of spark ids, from primus', function (done) {
+    srv.listen(function () {
+      primus.on('connection', function (spark) {
+        primus.join(spark, 'room1', function () {
+          primus.leave([spark.id], 'room1', function () {
+            spark.room('room1').clients(function (err, clients) {
+              expect(!!~clients.indexOf(spark.id)).to.eql(false);
+              done();
+            });
+          });
+        });
+      });
+      client(srv, primus);
+    });
+  });
+
+  it('should join and leave multiple rooms by spark ids, from primus', function (done) {
+    srv.listen(function () {
+      var count = 3;
+      var sparks = [];
+      primus.on('connection', function (spark) {
+        sparks.push(spark.id);
+        if (!--count) {
+          primus.join(sparks, 'room1 room2', function () {
+            expect(primus.isRoomEmpty('room1')).to.be(false);
+            expect(primus.isRoomEmpty('room2')).to.be(false);
+            primus.leave(sparks, 'room1 room2', function () {
+              expect(primus.isRoomEmpty('room1')).to.be(true);
+              expect(primus.isRoomEmpty('room2')).to.be(true);
+              done();
+            });
+          });
+        }
+      });
+      client(srv, primus);
+      client(srv, primus);
+      client(srv, primus);
+    });
+  });
+
+  it('should remove spark from room by passing array of spark ids, from primus', function (done) {
+    srv.listen(function () {
+      var count = 3;
+      var sparks = [];
+      primus.on('connection', function (spark) {
+        sparks.push(spark);
+        if (!--count) {
+          primus.join(sparks, 'room1', function () {
+            primus.leave(sparks, 'room1', function () {
+              spark.in('room1').clients(function (err, clients) {
+                expect(clients.length).to.eql(0);
+                done();
+              });
+            });
+          });
+        }
+      });
+      client(srv, primus);
+      client(srv, primus);
       client(srv, primus);
     });
   });
