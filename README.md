@@ -334,8 +334,8 @@ is called on a spark or when the `end` event is emitted on the client.
 First argument of the callback is an array with all `rooms` client joined.
 
 ```javascript
-primus.on('leaveallrooms', function (room, spark) {
-  console.log(spark.id + ' leaving all rooms:', room);
+primus.on('leaveallrooms', function (rooms, spark) {
+  console.log(spark.id + ' leaving all rooms:', rooms);
 });
 ```
 
@@ -502,8 +502,8 @@ is called on a spark or when the `end` event is emitted on the client.
 First argument of the callback is an array with all `rooms` client joined.
 
 ```javascript
-spark.on('leaveroom', function (room) {
-  console.log(room);
+spark.on('leaveallrooms', function (rooms) {
+  console.log(rooms);
 });
 ```
 
