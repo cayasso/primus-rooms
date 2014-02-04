@@ -29,7 +29,7 @@ describe('primus-rooms', function () {
   });
 
   afterEach(function afterEach(done) {
-    srv.close();
+    primus.end();
     done();
   });
 
@@ -477,6 +477,9 @@ describe('primus-rooms', function () {
   });
 
   it('should not allow broadcasting from a destroyed spark', function (done) {
+
+    var skip_next = false;
+
     srv.listen(function () {
       
       primus.on('connection', function (spark) {
@@ -484,6 +487,8 @@ describe('primus-rooms', function () {
       });
       
       primus.on('disconnection', function (spark) {
+        if (skip_next) return;
+        skip_next = true;
         spark.room('room1').write('hola');
         done();
       });
