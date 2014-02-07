@@ -5,6 +5,10 @@
 
 Node.JS module that adds room capabilities to a [Primus](https://github.com/3rd-Eden/primus) server.
 
+
+## Compatibility
+####This project is currently compatible with the 1.+ versions of Primus, it is not compatible with the latest [2.0.+ release](https://github.com/primus/primus/releases/tag/2.0.0), changes are in the works for getting all plugins aligned with the latest Primus. Stay tuned!!!####
+
 ## Instalation
 
 ```
