@@ -36,7 +36,7 @@
     "ws": "~0.4.27",
     "primus": "git://github.com/primus/primus.git",
     "primus-emitter": "git://github.com/cayasso/primus-emitter.git",
-    "primus-multiplex": "git://github.com/cayasso/primus-emitter.git",
+    "primus-multiplex": "git://github.com/cayasso/primus-multiplex.git",
     "matcha": "~0.4.1"
   }
 }
