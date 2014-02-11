@@ -1,6 +1,6 @@
 {
   "name": "primus-rooms",
-  "version": "2.3.0",
+  "version": "3.0.0",
   "description": "Simple rooms wrapper for Primus",
   "author": "Jonathan Brumley <cayasso@gmail.com>",
   "homepage": "https://github.com/cayasso/primus-rooms",
@@ -35,8 +35,8 @@
     "expect.js": "*",
     "ws": "~0.4.27",
     "primus": "git://github.com/primus/primus.git",
-    "primus-emitter": "git://github.com/cayasso/primus-emitter.git",
-    "primus-multiplex": "git://github.com/cayasso/primus-multiplex.git",
+    "primus-emitter": "~2.1.x",
+    "primus-multiplex": "~3.x",
     "matcha": "~0.4.1"
   }
 }
