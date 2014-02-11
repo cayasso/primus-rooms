@@ -30,13 +30,13 @@
     "debug": "0.7.x",
     "batch": "~0.5.0"
   },
-
   "devDependencies": {
     "mocha": "*",
     "expect.js": "*",
+    "primus": "git://github.com/primus/primus.git",
     "ws": "~0.4.27",
-    "primus-emitter": "~2.x.x",
+    "primus-emitter": "git://github.com/cayasso/primus-emitter.git",
     "primus-multiplex": "~2.x.x",
-    "primus": "1.5.2"
+    "matcha": "~0.4.1"
   }
 }
