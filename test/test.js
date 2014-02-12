@@ -132,7 +132,7 @@ describe('primus-rooms', function () {
   });
 
   it('should leave room', function (done) {
-   srv.listen(client.port, function () {  
+   srv.listen(client.port, function () {
       primus.on('connection', function (spark) {
         spark.join('room1');
         spark.leave('room1');
@@ -726,7 +726,7 @@ describe('primus-rooms', function () {
   it('should empty multiple rooms from server', function (done) {
     var sparks = [];
     srv.listen(function () {
-      primus.on('connection', function (spark) {        
+      primus.on('connection', function (spark) {
         spark.join('room1', function (err) {
           if (err) return done(err);
           spark.join('room2', function (err) {
@@ -1386,6 +1386,35 @@ describe('primus-rooms', function () {
   });
 
   describe('primus-emitter', function () {
+
+    it('should ignore `primus-rooms` reserved events', function (done) {
+
+      var events = rooms.Rooms.events;
+
+      primus.use('emitter', 'primus-emitter');
+
+      srv.listen(client.port, function () {
+        var cl = client(srv, primus);
+
+        primus.on('connection', function (spark) {
+          events.forEach(function (ev) {
+            spark.on(ev, function (data) {
+              if ('not ignored' === data) {
+                done(new Error('should be ignored'));
+              }
+            });
+          });
+        });
+
+        cl.on('open', function () {
+          events.forEach(function (ev) {
+            cl.send(ev, 'not ignored');
+          });
+          done();
+        });
+
+      });
+    });
 
     it('should allow sending to specific room from client', function (done) {
       
@@ -2102,7 +2131,7 @@ describe('primus-rooms', function () {
       var a = primus.channel('a');
       var disconnected = false;
       srv.listen(function () {
-        a.on('connection', function (spark) { 
+        a.on('connection', function (spark) {
           spark.join('a');         
           a.on('leaveallrooms', function (rooms) {
             if (disconnected) return;
