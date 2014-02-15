@@ -1336,8 +1336,9 @@ describe('primus-rooms', function () {
         primus.join(spark, 'a');
         primus.on('leaveallrooms', function (rooms, socket) {
           if (disconnected) return;
-          expect(spark).to.be.eql(socket);
           disconnected = true;
+          expect(rooms).to.be.eql(['a']);
+          expect(spark).to.be.eql(socket);
           done();
         });
         spark.write('end');
@@ -2133,9 +2134,11 @@ describe('primus-rooms', function () {
       srv.listen(function () {
         a.on('connection', function (spark) {
           spark.join('a');         
-          a.on('leaveallrooms', function (rooms) {
+          a.on('leaveallrooms', function (rooms, socket) {
             if (disconnected) return;
             disconnected = true;
+            expect(rooms).to.be.eql(['a']);
+            expect(spark).to.be.eql(socket);
             done();
           });
           spark.write('end');
