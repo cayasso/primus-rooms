@@ -27,7 +27,7 @@ $ npm install primus-rooms@2.3.0
   spark.room('room').except(spark.id).write('message');
   ```
 
-- The `leaveallrooms` event handler is no longer called on the `spark` when when the client closes the connection:
+- The `leaveallrooms` event handler is no longer called on the `spark` when the client closes the connection:
 
   ```javascript
   spark.on('leaveallrooms', function (rooms, spark) {
