@@ -167,7 +167,7 @@ with its own `memory` adapter but its easy to provide a custom one.
 
 ```javascript
 // as argument
-var primus = new Primus(url, { transformer: 'sockjs', adapter: myAdapter });
+var primus = new Primus(url, { transformer: 'sockjs', rooms{ adapter: myAdapter }});
 primus.use('rooms', Rooms);
 
 // by calling the method
