@@ -855,7 +855,7 @@ describe('primus-rooms', function () {
 
   it('should allow passing adapter as argument', function (done) {
 
-    opts.adapter = {
+    var adapter = {
       add: function () {},
       del: function () {},
       delAll: function () {},
@@ -863,10 +863,12 @@ describe('primus-rooms', function () {
       clients: function () {}
     };
 
-    primus = server(srv, { rooms: opts });
+    opts.rooms = { adapter: adapter };
+
+    primus = server(srv, opts);
     srv.listen(function () {
-      expect(primus.adapter).to.be.eql(opts.adapter);
-      delete opts.adapter;
+      expect(primus.adapter).to.be.eql(adapter);
+      delete opts.rooms;
       done();
     });
   });
@@ -879,7 +881,6 @@ describe('primus-rooms', function () {
       broadcast: function () {},
       clients: function () {}
     };
-    primus = server(srv, { rooms: opts });
     srv.listen(function () {
       primus.adapter = adapter;
       expect(primus.adapter).to.be.eql(adapter);
