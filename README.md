@@ -43,6 +43,8 @@ $ npm install primus-rooms@2.3.0
   });
   ```
 
+- `primus.adapter` is no longer a function. Jump to [`primus.adapter`](https://github.com/cayasso/primus-rooms#primusadapteradapter) to see how you can provide a custom `adapter`.
+
 ## Installation
 
 ```
@@ -160,7 +162,7 @@ primus.on('connection', function(spark){
 
 ## API
 
-### primus.adapter(Adapter)
+### primus.adapter
 
 Set your own `adapter` for rooms, by default `primus-rooms` comes 
 with its own `memory` adapter but its easy to provide a custom one.
@@ -173,8 +175,8 @@ var primus = new Primus(url, {
 });
 primus.use('rooms', Rooms);
 
-// by calling the method
-primus.adapter(new MyAdapter());
+// by setting the property
+primus.adapter = new MyAdapter();
 ```
 
 ### primus.join(sparks, name, [fn])
