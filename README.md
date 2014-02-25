@@ -43,7 +43,7 @@ $ npm install primus-rooms@2.3.0
   });
   ```
 
-- `primus.adapter` is no longer a function. Jump to [`primus.adapter`](https://github.com/cayasso/primus-rooms#primusadapteradapter) to see how you can provide a custom `adapter`.
+- `primus.adapter` is no longer a function. Jump to [`primus.adapter`](https://github.com/cayasso/primus-rooms#primusadapter) to see how you can provide a custom `adapter`.
 
 ## Installation
 
