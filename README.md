@@ -145,17 +145,17 @@ primus.on('connection', function(spark){
     if (~spark.rooms().indexOf(room)) {
       send();
     } else {
-    // join the room
-    spark.join(room, function(){
-      send();
-    })
+      // join the room
+      spark.join(room, function(){
+        send();
+      });
     }
 
     // send to all clients in the room
     function send() {
       spark.room(room).write(message);
     }
-  })
+  });
 
 });
 ```
@@ -502,8 +502,8 @@ Check to see if a room is empty.
 spark.isRoomEmpty('sport');
 ```
 
-or you can also use it like bellow but can only pass one room,
-multiple rooms will are not supported:
+or you can also use it like below but you can only pass one room,
+multiple rooms are not supported:
 
 ```javascript
 spark.room('sport').isRoomEmpty();
