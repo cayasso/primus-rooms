@@ -809,27 +809,25 @@ describe('primus-rooms', function () {
 
   it('should return all rooms of specific client from server', function (done) {
     srv.listen(function () {
-      var first = true;
+      var useId = true;
       client(srv, primus);
       primus.on('connection', function (spark) {
-        if (first) {
+        if (useId) {
+          useId = false;
           spark.join('a', function (err) {
             if (err) return done(err);
             spark.join('b', function (err) {
               if (err) return done(err);
               spark.leave('c', function (err) {
                 if (err) return done(err);
-                primus.rooms(function (err, rooms) {
+                primus.rooms(spark.id, function (err, rooms) {
                   if (err) return done(err);
-                  rooms.forEach(function (r) {
-                    expect(['a', 'b']).to.contain(r);
-                  });
+                  expect(rooms).to.eql(['a', 'b']);
                   client(srv, primus);
                 });
               });
             });
           });
-          first = false;
         } else {
           spark.join('d', function (err) {
             if (err) return done(err);
@@ -839,9 +837,7 @@ describe('primus-rooms', function () {
                 if (err) return done(err);
                 primus.rooms(spark, function (err, rooms) {
                   if (err) return done(err);
-                  rooms.forEach(function (r) {
-                    expect(['d', 'e']).to.contain(r);
-                  });
+                  expect(rooms).to.eql(['d', 'e']);
                   primus.empty(done);
                 });
               });
@@ -849,7 +845,6 @@ describe('primus-rooms', function () {
           });
         }
       });
-      
     });
   });
 

@@ -321,7 +321,6 @@ Remove all clients from a `room` or multiple `room`s.
 primus.room('sport').empty();
 
 // or
-
 primus.empty('sport');
 ```
 
@@ -334,7 +333,7 @@ primus.room('news sport').empty();
 primus.empty('news sport');
 ```
 
-### primus.rooms([spark])
+### primus.rooms([spark], [fn])
 
 Get all active rooms on the server.
 
@@ -346,6 +345,15 @@ Get all rooms a specific spark is connected to.
 
 ```javascript
 primus.rooms(spark, fn);
+```
+
+You can also use the spark id:
+
+```javascript
+primus.rooms(spark.id, fn);
+
+// or
+primus.rooms('1386018854525$0', fn);
 ```
 
 ### primus.on('joinroom')
@@ -433,7 +441,7 @@ spark.room('room').write('hi');
 
 ### spark.room(name).except(ids);
 
-Broadcast messages to clients in a room except to those especified.
+Broadcast messages to clients in a room except to those specified.
 
 ```javascript
 spark.room('room').except('1386018854525$0 1386018854526$1').write('hi');
