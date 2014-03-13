@@ -33,7 +33,7 @@ function client(srv, primus, port){
 
 // creates the server
 function server(srv, opts) {
-  return Primus(srv, opts)
+  return new Primus(srv, opts)
     .use('rooms', rooms)
     //.use('redis', 'primus-redis');
 }
@@ -83,8 +83,12 @@ describe('primus-rooms', function () {
       primus.on('connection', function (spark) {
         spark.join('room1');
         spark.room('room1').clients(function (err, clients) {
-          expect(!!~clients.indexOf(spark.id)).to.eql(true);
-          spark.leaveAll(done);
+          expect(clients).to.contain(spark.id);
+          spark.join(1);
+          spark.room(1).clients(function (err, clients) {
+            expect(clients).to.contain(spark.id);
+            spark.leaveAll(done);
+          });
         });
       });
       client(srv, primus);
@@ -92,7 +96,7 @@ describe('primus-rooms', function () {
   });
     
   it('should join multiple rooms at once', function (done) {
-   srv.listen(client.port, function () {
+    srv.listen(client.port, function () {
       primus.on('connection', function (spark) {
         spark.join('room1 room2 room3', function () {
           spark.room('room1').clients(function (err, clients) {
@@ -112,15 +116,15 @@ describe('primus-rooms', function () {
   });
 
   it('should join multiple rooms at once passing an array as argument', function (done) {
-   srv.listen(client.port, function () {
+    srv.listen(client.port, function () {
       primus.on('connection', function (spark) {
-        spark.join(['room1', 'room2', 'room3'], function () {
-          spark.room('room1').clients(function (err, clients) {
-            expect(!!~clients.indexOf(spark.id)).to.be.ok();
+        spark.join([1, 'room2', 'room3'], function () {
+          spark.room(1).clients(function (err, clients) {
+            expect(clients).to.contain(spark.id);
             spark.room('room2').clients(function (err, clients) {
-              expect(!!~clients.indexOf(spark.id)).to.be.ok();
+              expect(clients).to.contain(spark.id);
               spark.room('room3').clients(function (err, clients) {
-                expect(!!~clients.indexOf(spark.id)).to.be.ok();
+                expect(clients).to.contain(spark.id);
                 spark.leaveAll(done);
               });
             });
@@ -132,7 +136,7 @@ describe('primus-rooms', function () {
   });
 
   it('should leave room', function (done) {
-   srv.listen(client.port, function () {
+    srv.listen(client.port, function () {
       primus.on('connection', function (spark) {
         spark.join('room1');
         spark.leave('room1');
@@ -146,7 +150,7 @@ describe('primus-rooms', function () {
   });
 
   it('should leave multiple rooms at once', function (done) {
-   srv.listen(client.port, function () {
+    srv.listen(client.port, function () {
       primus.on('connection', function (spark) {
         spark.join('room1 room2 room3 room4', function () {
           spark.leave('room1 room2 room3', function () {
@@ -162,12 +166,12 @@ describe('primus-rooms', function () {
   });
 
   it('should leave multiple rooms at once passing an array', function (done) {
-   srv.listen(client.port, function () {
+    srv.listen(client.port, function () {
       primus.on('connection', function (spark) {
-        spark.join('room1 room2 room3 room4', function () {
-          spark.leave(['room1', 'room2', 'room3'], function () {
+        spark.join('1 room2 room3 room4', function () {
+          spark.leave([1, 'room2', 'room3'], function () {
             spark.rooms(function (err, rooms) {
-              expect(rooms).to.be.eql(['room4']);
+              expect(rooms).to.eql(['room4']);
               spark.leaveAll(done);
             });
           });
@@ -178,7 +182,7 @@ describe('primus-rooms', function () {
   });
 
   it('should leave all rooms', function (done) {
-   srv.listen(client.port, function () {
+    srv.listen(client.port, function () {
       primus.on('connection', function (spark) {
         spark.join('room1', function (err) {
           if (err) return done(err);
@@ -190,7 +194,7 @@ describe('primus-rooms', function () {
                 if (err) return done(err);
                 spark.rooms(function (err, rooms) {
                   if (err) return done(err);
-                  expect(rooms).to.be.eql([]);
+                  expect(rooms).to.eql([]);
                   done();
                 });
               });
@@ -247,7 +251,7 @@ describe('primus-rooms', function () {
   });
 
   it('should allow method channing', function (done) {
-   srv.listen(client.port, function () {
+    srv.listen(client.port, function () {
       primus.on('connection', function (spark) {
         spark
         .join('room1')
@@ -269,7 +273,7 @@ describe('primus-rooms', function () {
   });
 
   it('should allow simple connection', function (done) {
-   srv.listen(client.port, function () {
+    srv.listen(client.port, function () {
       var c1 = client(srv, primus);
       primus.on('connection', function (spark) {
         spark.on('data', function (data) {
@@ -301,7 +305,7 @@ describe('primus-rooms', function () {
           spark.join(data, function () {
             if (4 === ++total) {
               --total;
-              sender.room('room1 room2 room3').write('hi');
+              sender.room([1, 'room2', 'room3']).write('hi');
             }
           });
         });
@@ -333,11 +337,11 @@ describe('primus-rooms', function () {
 
       function finish () {
         if (1 > --total) {
-          primus.empty('room1', done);
+          primus.empty('1 room2 room3 send', done);
         }
       }
       
-      c1.write('room1');
+      c1.write(1);
       c2.write('room2');
       c3.write('room3');
       c4.write('send');
@@ -657,7 +661,7 @@ describe('primus-rooms', function () {
       var cl = client(srv, primus);
 
       setTimeout(function () {
-        cl.write('send')
+        cl.write('send');
       }, 10);
     });
   });
