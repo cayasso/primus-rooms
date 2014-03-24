@@ -165,7 +165,7 @@ primus.on('connection', function(spark){
 ### primus.adapter
 
 Set your own `adapter` for rooms, by default `primus-rooms` comes 
-with its own `memory` adapter but its easy to provide a custom one.
+with its own `memory` adapter [primus-rooms-adapter](https://github.com/cayasso/primus-rooms-adapter) but its easy to provide a custom one.
 
 ```javascript
 // as argument
@@ -178,6 +178,8 @@ primus.use('rooms', Rooms);
 // by setting the property
 primus.adapter = new MyAdapter();
 ```
+
+For more information on how to create your own custom adapter check out the documentation of [primus-rooms-adapter](https://github.com/cayasso/primus-rooms-adapter).
 
 ### primus.join(sparks, name, [fn])
 
