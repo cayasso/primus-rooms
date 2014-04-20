@@ -488,12 +488,12 @@ Leave multiple rooms at once.
 spark.leave('room1 room2 room3', fn);
 ```
 
-### spark.leaveAll()
+### spark.leaveAll([fn])
 
-Leave all rooms the client has joined.
+Leave all rooms the client has joined, `fn` is optional callback.
 
 ```javascript
-spark.leaveAll();
+spark.leaveAll(fn);
 ```
 
 ### spark.rooms()
