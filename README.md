@@ -89,7 +89,7 @@ primus.on('connection', function (spark) {
     // leave a room
     if ('leave' === action) {
       spark.leave(room, function () {
-        
+
         // send message to this client
         spark.write('you left room ' + room);
       });
@@ -299,9 +299,9 @@ primus.room('room').except(except).write('hi');
 
 ### primus.room(room).clients([fn])
 
-Get all client `ids` connected to a specific `room`. 
-If no callback is passed the function will return synchronously the ids 
-but please remember that NOT all adapters are guaranteed to be able to do 
+Get all client `ids` connected to a specific `room`.
+If no callback is passed the function will return synchronously the ids
+but please remember that NOT all adapters are guaranteed to be able to do
 this operation synchronously.
 
 ```javascript
@@ -360,7 +360,7 @@ primus.rooms('1386018854525$0', fn);
 
 ### primus.on('joinroom')
 
-The `joinroom` event is emitted every time a spark has joined a room. 
+The `joinroom` event is emitted every time a spark has joined a room.
 First argument of the callback is the `room` and second argument is the spark.
 
 ```javascript
@@ -371,7 +371,7 @@ primus.on('joinroom', function (room, spark) {
 
 ### primus.on('leaveroom')
 
-The `leaveroom` event is emitted every time a spark has left a room. 
+The `leaveroom` event is emitted every time a spark has left a room.
 First argument of the callback is the `room` and second argument is the spark.
 
 ```javascript
@@ -382,8 +382,8 @@ primus.on('leaveroom', function (room, spark) {
 
 ### primus.on('leaveallrooms')
 
-The `leaveallrooms` event is emitted every time the leaveAll method 
-is called on a spark or when the `end` event is emitted on the client. 
+The `leaveallrooms` event is emitted every time the leaveAll method
+is called on a spark or when the `end` event is emitted on the client.
 First argument of the callback is an array with all `rooms` client joined.
 
 ```javascript
@@ -394,7 +394,7 @@ primus.on('leaveallrooms', function (rooms, spark) {
 
 ### primus.on('roomserror')
 
-The `roomserror` event is emitted every time a spark encounter an error when joining or leaving a room. 
+The `roomserror` event is emitted every time a spark encounter an error when joining or leaving a room.
 First argument of the callback is the `error` object and second argument is the spark.
 
 ```javascript
@@ -458,9 +458,9 @@ spark.room('room').except(except).write('hi');
 
 ### spark.room(room).clients([fn])
 
-Get all client `ids` connected to specific `room`. 
-If no callback is passed the function will return synchronously the ids 
-but please remember that NOT all adapters are guaranteed to be able to do 
+Get all client `ids` connected to specific `room`.
+If no callback is passed the function will return synchronously the ids
+but please remember that NOT all adapters are guaranteed to be able to do
 this operation synchronously.
 
 ```javascript
@@ -528,7 +528,7 @@ spark.room('sport news').isRoomEmpty();
 
 ### spark.on('joinroom')
 
-The `joinroom` event is emitted every time a spark has joined a room. 
+The `joinroom` event is emitted every time a spark has joined a room.
 First argument of the callback is the `room`.
 
 ```javascript
@@ -539,7 +539,7 @@ spark.on('joinroom', function (room) {
 
 ### spark.on('leaveroom')
 
-The `leaveroom` event is emitted every time a spark has left a room. 
+The `leaveroom` event is emitted every time a spark has left a room.
 First argument of the callback is the `room`.
 
 ```javascript
@@ -550,7 +550,7 @@ spark.on('leaveroom', function (room) {
 
 ### spark.on('leaveallrooms')
 
-The `leaveallrooms` event is emitted every time the leaveAll method 
+The `leaveallrooms` event is emitted every time the leaveAll method
 is called on a spark.
 First argument of the callback is an array with all `rooms` client joined.
 
@@ -562,7 +562,7 @@ spark.on('leaveallrooms', function (rooms) {
 
 ### spark.on('roomserror')
 
-The `roomserror` event is emitted every time a spark encounter an error when joining or leaving a room. 
+The `roomserror` event is emitted every time a spark encounter an error when joining or leaving a room.
 First argument of the callback is the `error` object.
 
 ```javascript
