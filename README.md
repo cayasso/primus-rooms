@@ -358,6 +358,14 @@ primus.rooms(spark.id, fn);
 primus.rooms('1386018854525$0', fn);
 ```
 
+### primus.isRoomEmpty(room, [fn])
+
+Check if a `room` is empty, `fn` is optional callback.
+
+```javascript
+primus.isRoomEmpty('sport', fn);
+```
+
 ### primus.on('joinroom')
 
 The `joinroom` event is emitted every time a spark has joined a room.
@@ -504,26 +512,12 @@ Get all rooms client is connected to.
 spark.rooms();
 ```
 
-### spark.isRoomEmpty([room])
+### spark.isRoomEmpty(name, [fn])
 
-Check to see if a room is empty.
-
-```javascript
-spark.isRoomEmpty('sport');
-```
-
-or you can also use it like below but you can only pass one room,
-multiple rooms are not supported:
+Check if a `room` is empty, `fn` is optional callback.
 
 ```javascript
-spark.room('sport').isRoomEmpty();
-```
-
-This is not supported, you will get incorrect results.
-
-```javascript
-// wrong
-spark.room('sport news').isRoomEmpty();
+spark.isRoomEmpty('sport', fn);
 ```
 
 ### spark.on('joinroom')
