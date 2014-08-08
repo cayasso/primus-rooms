@@ -29,7 +29,7 @@
   "dependencies": {
     "debug": "0.7.x",
     "batch": "0.5.x",
-    "primus-rooms-adapter": "0.1.x"
+    "primus-rooms-adapter": "0.2.x"
   },
   "devDependencies": {
     "mocha": "*",
