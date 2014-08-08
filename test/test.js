@@ -1443,16 +1443,17 @@ describe('primus-rooms', function () {
       var total = 0
         , sender;
 
+      primus.use('emitter', 'primus-emitter');
       srv.listen(client.port, function () {
         primus.on('connection', function (spark) {
-          spark.on('data', function (data) {
+          spark.on('msg', function (data) {
             if ('send' === data) {
               sender = spark;
             }
             spark.join(data, function () {
               if (3 === ++total) {
                 --total;
-                sender.in('user:*:abc').write('hi');
+                sender.in('user:*:abc').send('news', 'hi');
               }
             });
           });
@@ -1462,22 +1463,22 @@ describe('primus-rooms', function () {
           , c2 = client(srv, primus)
           , c3 = client(srv, primus);
 
-        c1.on('data', function (msg) {
+        c1.on('news', function (msg) {
           done(new Error('not'));        
         });
 
-        c2.on('data', function (msg) {
+        c2.on('news', function (msg) {
           expect(msg).to.be('hi');
           done();
         });
 
-        c3.on('data', function (msg) {
+        c3.on('news', function (msg) {
           done(new Error('not'));
         });
 
-        c1.write('user');
-        c2.write('user:*:abc');
-        c3.write('send');
+        c1.send('msg', 'user');
+        c2.send('msg', 'user:*:abc');
+        c3.send('msg', 'send');
       });
     });
 
