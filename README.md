@@ -160,6 +160,55 @@ primus.on('connection', function(spark){
 });
 ```
 
+### Wildcard support
+
+```javascript
+spark1.join('user:*');
+spark2.join('user:*:*');
+spark3.join('user:*:*:123');
+```
+
+Then later in your code send a message as normal like this:
+
+```javascript
+// All clients of the rooms above should receive 'hello'.
+primus.in('user:jb:abc:123').write('hello');
+```
+
+All clients that joined rooms `user:*`, `user:*:*`, `user:*:*:123` should receive the `hello` message.
+
+```javascript
+// All clients of the rooms above should receive 'hello'.
+spark1.on('data', function ondata(msg) {
+  console.log(msg); //-> hello
+});
+
+spark2.on('data', function ondata(msg) {
+  console.log(msg); //-> hello
+});
+
+spark3.on('data', function ondata(msg) {
+  console.log(msg); //-> hello
+});
+```
+
+### Disabling wildcard
+Wildcard is enabled by default, to disable it just pass `{ wildcard: false }` in the rooms options when instantiating primus.
+
+```javascript
+var Primus = require('primus');
+var Rooms = require('primus-rooms');
+var server = require('http').createServer();
+
+// disabling wildcard
+var primus = new Primus(server, { rooms: { wildcard: false } });
+
+// add rooms to Primus
+primus.use('rooms', Rooms);
+```
+
+For more examples on how to use `wildcard` check the wildcard tests.
+
 ## API
 
 ### primus.adapter
