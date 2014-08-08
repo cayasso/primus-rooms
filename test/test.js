@@ -284,7 +284,7 @@ describe('primus-rooms', function () {
       c1.write('send');
     });
   });
-
+    
   it('should allow sending to multiple rooms', function (done) {
 
     var total = 0
@@ -1377,6 +1377,204 @@ describe('primus-rooms', function () {
         if (1 > --total) done();
       }
     });
+  });
+
+  describe('wildcards', function () {
+
+    it('should allow joining to wildcard room', function (done) {
+
+      var total = 0
+        , sender;
+
+      srv.listen(client.port, function () {
+        primus.on('connection', function (spark) {
+          spark.on('data', function (data) {
+            if ('send' === data) {
+              sender = spark;
+            }
+            spark.join(data, function () {
+              if (4 === ++total) {
+                --total;
+                sender.in('user:123:abc').write('hi');
+              }
+            });
+          });
+        });
+
+        var c1 = client(srv, primus)
+          , c2 = client(srv, primus)
+          , c3 = client(srv, primus)
+          , c4 = client(srv, primus);
+
+        c1.on('data', function (msg) {
+          expect(msg).to.be('hi');
+          finish();
+        });
+
+        c2.on('data', function (msg) {
+          expect(msg).to.be('hi');
+          finish();
+        });
+
+        c3.on('data', function (msg) {
+          expect(msg).to.be('hi');
+          finish();
+        });
+
+        c4.on('data', function (msg) {
+          done(new Error('not'));
+        });
+
+        function finish () {
+          if (1 > --total) {
+            primus.empty(['user', 'user:*', 'user:*:abc'], done);
+          }
+        }
+
+        c1.write('user:*');
+        c2.write('user:*:abc');
+        c3.write('user:123:abc');
+        c4.write('send');
+      });
+    });
+
+    it('should treat wildcard room strings as regular rooms', function (done) {
+
+      var total = 0
+        , sender;
+
+      srv.listen(client.port, function () {
+        primus.on('connection', function (spark) {
+          spark.on('data', function (data) {
+            if ('send' === data) {
+              sender = spark;
+            }
+            spark.join(data, function () {
+              if (3 === ++total) {
+                --total;
+                sender.in('user:*:abc').write('hi');
+              }
+            });
+          });
+        });
+
+        var c1 = client(srv, primus)
+          , c2 = client(srv, primus)
+          , c3 = client(srv, primus);
+
+        c1.on('data', function (msg) {
+          done(new Error('not'));        
+        });
+
+        c2.on('data', function (msg) {
+          expect(msg).to.be('hi');
+          done();
+        });
+
+        c3.on('data', function (msg) {
+          done(new Error('not'));
+        });
+
+        c1.write('user');
+        c2.write('user:*:abc');
+        c3.write('send');
+      });
+    });
+
+    it('should send to rooms and wildcard rooms when the target room has a wildcard', function (done) {
+
+      var total = 0
+        , sender;
+
+      srv.listen(client.port, function () {
+        primus.on('connection', function (spark) {
+          spark.on('data', function (data) {
+            if ('send' === data) {
+              sender = spark;
+            }
+            spark.join(data, function () {
+              if (3 === ++total) {
+                --total;
+                sender.in('user:*:abc').write('hi');
+              }
+            });
+          });
+        });
+
+        var c1 = client(srv, primus)
+          , c2 = client(srv, primus)
+          , c3 = client(srv, primus);
+
+        c1.on('data', function (msg) {
+          expect(msg).to.be('hi');
+          finish();
+        });
+
+        c2.on('data', function (msg) {
+          expect(msg).to.be('hi');
+          finish();
+        });
+
+        c3.on('data', function (msg) {
+          done(new Error('not'));
+        });
+
+        function finish () {
+          if (1 > --total) {
+            primus.empty('1 room2 room3 send', done);
+          }
+        }
+
+        c1.write('user:*:*');
+        c2.write('user:*:abc');
+        c3.write('send');
+      });
+    });
+
+    it('should be able to disable wildcard', function (done) {
+
+      var total = 0
+        , sender;
+
+      primus = server(srv, { rooms: { wildcard: false }});
+      srv.listen(client.port, function () {
+        primus.on('connection', function (spark) {
+          spark.on('data', function (data) {
+            if ('send' === data) {
+              sender = spark;
+            }
+            spark.join(data, function () {
+              if (3 === ++total) {
+                --total;
+                sender.in('user:123:abc').write('hi');
+              }
+            });
+          });
+        });
+
+        var c1 = client(srv, primus)
+          , c2 = client(srv, primus)
+          , c3 = client(srv, primus);
+
+        c1.on('data', function (msg) {
+          expect(msg).to.be('hi');
+          done();
+        });
+
+        c2.on('data', function (msg) {
+          done(new Error('not'));
+        });
+
+        c3.on('data', function (msg) {
+          done(new Error('not'));
+        });
+
+        c1.write('user:123:abc');
+        c2.write('user:*:abc');
+        c3.write('send');
+      });
+    });
+
   });
 
   describe('primus-emitter', function () {
