@@ -27,17 +27,18 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "debug": "0.7.x",
+    "debug": "1.0.x",
     "batch": "0.5.x",
     "primus-rooms-adapter": "0.2.x"
   },
   "devDependencies": {
-    "mocha": "*",
     "expect.js": "*",
-    "ws": "~0.4.27",
+    "matcha": "^0.5.0",
+    "mocha": "*",
+    "pre-commit": "0.0.9",
     "primus": "git://github.com/primus/primus.git",
-    "primus-emitter": "~3.x.x",
-    "primus-multiplex": "~3.x.x",
-    "matcha": "~0.4.1"
+    "primus-emitter": "^3.0.3",
+    "primus-multiplex": "^3.0.2",
+    "ws": "^0.4.32"
   }
 }
