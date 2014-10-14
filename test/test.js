@@ -909,22 +909,42 @@ describe('primus-rooms', function () {
     srv.listen(function () {
       var c1 = client(srv, primus);
       primus.on('connection', function (spark) {
-        spark.join('a');
-        spark.on('end', function () {
-          setTimeout(function () {
-            spark.rooms(function (err, rooms) {
+        var rms = spark._rooms;
+        var destroy = rms.destroy;
+        rms.destroy = function () {
+          destroy.call(rms, function () {
+            rms.rooms(function (err, rooms) {
               if (err) return done(err);
               expect(rooms).to.be.empty();
               primus.empty(done);
             });
-          }, 100);
-        });
-        spark.write('end');
+          });
+        };
+        spark.join('a');
+        spark.write('ending');
       });
       c1.on('open', function () {
         c1.on('data', function (data) {
-          if ('end' === data) c1.end();
+          if ('ending' === data) c1.end();
         });
+      });
+    });
+  });
+
+  it('should destroy references to instance', function (done) {
+    srv.listen(function () {
+      var c1 = client(srv, primus);
+      primus.on('connection', function (spark) {
+        var rms = spark._rooms;
+        setTimeout(function () {
+          spark._rooms.destroy(function () {
+            expect(spark._rooms).to.be(undefined);
+            expect(rms.primus).to.be(undefined);
+            expect(rms.ctx).to.be(undefined);
+            expect(rms.id).to.be(undefined);
+            done();
+          });
+        }, 10);
       });
     });
   });
