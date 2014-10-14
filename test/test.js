@@ -284,7 +284,7 @@ describe('primus-rooms', function () {
       c1.write('send');
     });
   });
-    
+
   it('should allow sending to multiple rooms', function (done) {
 
     var total = 0
@@ -1447,7 +1447,7 @@ describe('primus-rooms', function () {
 
         function finish () {
           if (1 > --total) {
-            primus.empty(['user', 'user:*', 'user:*:abc'], done);
+            primus.empty(['send', 'user:*', 'user:*:abc', 'user:123:abc'], done);
           }
         }
 
@@ -1472,7 +1472,6 @@ describe('primus-rooms', function () {
             }
             spark.join(data, function () {
               if (3 === ++total) {
-                --total;
                 sender.in('user:*:abc').send('news', 'hi');
               }
             });
@@ -1484,7 +1483,7 @@ describe('primus-rooms', function () {
           , c3 = client(srv, primus);
 
         c1.on('news', function (msg) {
-          done(new Error('not'));        
+          done(new Error('not'));
         });
 
         c2.on('news', function (msg) {
@@ -1542,7 +1541,7 @@ describe('primus-rooms', function () {
 
         function finish () {
           if (1 > --total) {
-            primus.empty('1 room2 room3 send', done);
+            primus.empty('send user:*:* user:*:abc', done);
           }
         }
 
@@ -1552,12 +1551,12 @@ describe('primus-rooms', function () {
       });
     });
 
-    it('should be able to disable wildcard', function (done) {
+    it('should allow to disable wildcard', function (done) {
 
       var total = 0
         , sender;
 
-      primus = server(srv, { rooms: { wildcard: false }});
+      primus = server(srv, { rooms: { wildcard: false } });
       srv.listen(client.port, function () {
         primus.on('connection', function (spark) {
           spark.on('data', function (data) {
@@ -1566,7 +1565,6 @@ describe('primus-rooms', function () {
             }
             spark.join(data, function () {
               if (3 === ++total) {
-                --total;
                 sender.in('user:123:abc').write('hi');
               }
             });
@@ -1595,7 +1593,6 @@ describe('primus-rooms', function () {
         c3.write('send');
       });
     });
-
   });
 
   describe('primus-emitter', function () {
