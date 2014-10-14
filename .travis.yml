@@ -1,6 +1,8 @@
-language: node_js
+language: 
+  - node_js
 before_install:
-  - npm install -g npm
+  - '[ "${TRAVIS_NODE_VERSION}" != "0.8" ] || npm install -g npm@1.4.28'
+  - npm install -g npm@latest
 node_js:
   - "0.10"
   - "0.8"
