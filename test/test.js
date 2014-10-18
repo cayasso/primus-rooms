@@ -905,47 +905,20 @@ describe('primus-rooms', function () {
     });
   });
 
-  it('should remove client from room on client disconnect', function (done) {
-    srv.listen(function () {
-      var c1 = client(srv, primus);
-      primus.on('connection', function (spark) {
-        var rms = spark._rooms;
-        var destroy = rms.destroy;
-        rms.destroy = function () {
-          destroy.call(rms, function () {
-            rms.rooms(function (err, rooms) {
-              if (err) return done(err);
-              expect(rooms).to.be.empty();
-              primus.empty(done);
-            });
-          });
-        };
-        spark.join('a');
-        spark.write('ending');
-      });
-      c1.on('open', function () {
-        c1.on('data', function (data) {
-          if ('ending' === data) c1.end();
-        });
-      });
-    });
-  });
-
   it('should destroy references to instance', function (done) {
     srv.listen(function () {
-      var c1 = client(srv, primus);
       primus.on('connection', function (spark) {
         var rms = spark._rooms;
-        setTimeout(function () {
-          spark._rooms.destroy(function () {
-            expect(spark._rooms).to.be(undefined);
-            expect(rms.primus).to.be(undefined);
-            expect(rms.ctx).to.be(undefined);
-            expect(rms.id).to.be(undefined);
-            done();
-          });
-        }, 10);
+        spark._rooms.destroy(function () {
+          expect(spark._rooms).to.be(undefined);
+          expect(rms.primus).to.be(undefined);
+          expect(rms.ctx).to.be(undefined);
+          expect(rms.id).to.be(undefined);
+          spark.removeListener('end', rms.onend);
+          done();
+        });
       });
+      client(srv, primus);
     });
   });
 
@@ -1342,24 +1315,22 @@ describe('primus-rooms', function () {
   });
 
   it('should trigger `leaveallrooms` events on client disconnect when listening on primus', function (done) {
-    var disconnected = false;
     srv.listen(function () {
-      var c1 = client(srv, primus);
       primus.on('connection', function (spark) {
-        primus.join(spark, 'a');
         primus.on('leaveallrooms', function (rooms, socket) {
-          if (disconnected) return;
-          disconnected = true;
           expect(rooms).to.be.eql(['a']);
           expect(spark).to.be.eql(socket);
-          done();
+          spark.rooms(function (err, rooms) {
+            if (err) return done(err);
+            expect(rooms).to.be.empty();
+            done();
+          });
         });
+        spark.join('a');
         spark.write('end');
       });
-      c1.on('open', function () {
-        c1.on('data', function (data) {
-          if ('end' === data) c1.end();
-        });
+      client(srv, primus).on('data', function (data) {
+        if ('end' === data) this.end();
       });
     });
   });
