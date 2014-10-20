@@ -9,8 +9,8 @@ var rooms = require('./lib');
 /**
  * Initialize the plugin.
  *
- * @param {Primus} primus - Primus instance.
- * @param {Object} options - The options.
+ * @param {Primus} primus - The `Primus` instance
+ * @param {Object} options - The options
  * @api public
  */
 
@@ -24,19 +24,19 @@ function PrimusRooms(primus, options) {
 }
 
 /**
- * Expose server.
+ * Expose the server function.
  */
 
 exports.server = PrimusRooms;
 
 /**
- * Expose `Adapter` object.
+ * Expose the `Adapter` constructor.
  */
 
 exports.Adapter = rooms.Adapter;
 
 /**
- * Expose `Rooms` object.
+ * Expose the `Rooms` constructor.
  */
 
 exports.Rooms = rooms.Rooms;
