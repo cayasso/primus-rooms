@@ -1263,9 +1263,7 @@ describe('primus-rooms', function () {
     });
   });
 
-  // THIS DO NO LONGER APPLY, NO TIME TO BIND AN EVENT TO SPARK WHEN IT IS ALREADY
-  // CLOSED.
-  /*it('should trigger `leaveallrooms` events on client disconnect', function (done) {
+  it('should trigger `leaveallrooms` events on client disconnect', function (done) {
     srv.listen(function () {
       var c1 = client(srv, primus);
       primus.on('connection', function (spark) {
@@ -1282,7 +1280,7 @@ describe('primus-rooms', function () {
         });
       });
     });
-  });*/
+  });
 
   it('should trigger `joinroom` event when joining room using primus join method', function (done) {
     srv.listen(function () {
