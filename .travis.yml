@@ -1,8 +1,11 @@
-language: 
+language:
   - node_js
-before_install:
-  - '[ "${TRAVIS_NODE_VERSION}" != "0.8" ] || npm install -g npm@1.4.28'
-  - npm install -g npm@latest
 node_js:
   - "0.10"
   - "0.8"
+before_install:
+  - 'if [ "${TRAVIS_NODE_VERSION}" == "0.8" ] ; then npm install -g npm@1.4.28; fi'
+script:
+  - "make test-travis"
+after_script:
+  - "npm install coveralls@2.11.x && cat coverage/lcov.info | coveralls"

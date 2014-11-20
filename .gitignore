@@ -1,4 +1,5 @@
-node_modules
-benchmark
+node_modules/
+benchmark/
+coverage/
 .DS_Store
-example
+npm-debug.log
