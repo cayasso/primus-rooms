@@ -30,18 +30,18 @@
   "license": "MIT",
   "dependencies": {
     "async": "0.9.x",
-    "debug": "1.0.x",
+    "debug": "2.1.x",
     "primus-rooms-adapter": "0.2.x"
   },
   "devDependencies": {
     "expect.js": "*",
     "istanbul": "^0.3.2",
-    "matcha": "^0.5.0",
+    "matcha": "^0.6.0",
     "mocha": "*",
     "pre-commit": "0.0.9",
     "primus": "git://github.com/primus/primus.git",
     "primus-emitter": "^3.0.3",
     "primus-multiplex": "^3.0.2",
-    "ws": "^0.4.32"
+    "ws": "^0.6.3"
   }
 }
