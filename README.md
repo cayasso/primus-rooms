@@ -1,8 +1,8 @@
 # Primus Rooms
 
-[![Build Status](https://travis-ci.org/cayasso/primus-rooms.svg?branch=master)](https://travis-ci.org/cayasso/primus-rooms)
-[![NPM version](https://badge.fury.io/js/primus-rooms.svg)](http://badge.fury.io/js/primus-rooms)
-[![Coverage Status](https://img.shields.io/coveralls/cayasso/primus-rooms.svg)](https://coveralls.io/r/cayasso/primus-rooms)
+[![Build Status](https://img.shields.io/travis/cayasso/primus-rooms/master.svg)](https://travis-ci.org/cayasso/primus-rooms)
+[![NPM version](https://img.shields.io/npm/v/primus-rooms.svg)](https://www.npmjs.com/package/primus-rooms)
+[![Coverage Status](https://img.shields.io/coveralls/cayasso/primus-rooms/master.svg)](https://coveralls.io/r/cayasso/primus-rooms)
 
 Node.JS module that adds room capabilities to a [Primus](https://github.com/primus/primus) server.
 
