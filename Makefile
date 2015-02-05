@@ -1,4 +1,4 @@
-MOCHA_OPTS = --bail --check-leaks --reporter spec
+MOCHA_OPTS = --bail --check-leaks
 
 coverage:
 	@node_modules/.bin/istanbul cover \
