@@ -35,13 +35,13 @@
   },
   "devDependencies": {
     "expect.js": "*",
-    "istanbul": "^0.3.2",
+    "istanbul": "^0.3.5",
     "matcha": "^0.6.0",
     "mocha": "*",
-    "pre-commit": "0.0.9",
-    "primus": "git://github.com/primus/primus.git",
+    "pre-commit": "^1.0.2",
+    "primus": "^2.4.12",
     "primus-emitter": "^3.0.3",
-    "primus-multiplex": "^3.0.2",
-    "ws": "^0.6.3"
+    "primus-multiplex": "^3.1.0",
+    "ws": "^0.7.1"
   }
 }
