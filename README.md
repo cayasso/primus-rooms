@@ -6,46 +6,6 @@
 
 Node.JS module that adds room capabilities to a [Primus](https://github.com/primus/primus) server.
 
-## Compatibility
-
-`primus-rooms@3.x.x` is now compatible with [primus@2.x.x](https://github.com/primus/primus/releases/tag/2.0.0) series, if for some reason you need to continue using an old version of `primus` then you can always go back and install a previous version of `primus-rooms` like so:
-
-```bash
-$ npm install primus-rooms@2.3.0
-```
-
-### Changes since version 3.0.0
-
-- It's no longer possible to automatically exclude the sender when sending a message from a client to all connected clients in a room:
-
-  ```javascript
-  spark.room('room').write('message'); // target all clients including the sender
-  ```
-
-  If you want to exclude the sender use the [`except`](https://github.com/cayasso/primus-rooms#sparkroomnameexceptids) method:
-
-  ```javascript
-  spark.room('room').except(spark.id).write('message');
-  ```
-
-- The `leaveallrooms` event handler is no longer called on the `spark` when the client closes the connection:
-
-  ```javascript
-  spark.on('leaveallrooms', function (rooms, spark) {
-    // no longer works when the client closes the connection
-  });
-  ```
-
-  You can still handle the event if you have a listener on the Primus instance:
-
-  ```javascript
-  primus.on('leaveallrooms', function (rooms, spark) {
-    // works when the client closes the connection
-  });
-  ```
-
-- `primus.adapter` is no longer a function. Jump to [`primus.adapter`](https://github.com/cayasso/primus-rooms#primusadapter) to see how you can provide a custom `adapter`.
-
 ## Installation
 
 ```
@@ -214,7 +174,7 @@ For more examples on how to use `wildcard` check the wildcard tests.
 
 ### primus.adapter
 
-Set your own `adapter` for rooms, by default `primus-rooms` comes 
+Set your own `adapter` for rooms, by default `primus-rooms` comes
 with its own `memory` adapter [primus-rooms-adapter](https://github.com/cayasso/primus-rooms-adapter) but its easy to provide a custom one.
 
 ```javascript
@@ -595,7 +555,7 @@ spark.on('leaveroom', function (room) {
 ### spark.on('leaveallrooms')
 
 The `leaveallrooms` event is emitted every time the leaveAll method
-is called on a spark.
+is called on a spark or when the connection gets closed.
 First argument of the callback is an array with all `rooms` client joined.
 
 ```javascript
