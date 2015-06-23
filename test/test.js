@@ -25,10 +25,12 @@ Object.defineProperty(client, 'port', {
 });
 
 // creates the client
-function client(srv, primus, port){
-  var addr = srv.address()
-    , url = 'http://' + addr.address + ':' + (port || addr.port);
-  return new primus.Socket(url);
+function client() {
+  var addr = srv.address();
+
+  if (!addr) throw new Error('Server is not listening');
+
+  return new primus.Socket('http://localhost:' + addr.port);
 }
 
 // creates the server
@@ -68,7 +70,7 @@ describe('primus-rooms', function () {
       done();
     });
 
-    client(srv, primus);
+    client();
   });
 
   it('should join room', function (done) {
@@ -84,7 +86,7 @@ describe('primus-rooms', function () {
       });
     });
 
-    client(srv, primus);
+    client();
   });
 
   it('should join multiple rooms at once', function (done) {
@@ -103,7 +105,7 @@ describe('primus-rooms', function () {
       });
     });
 
-    client(srv, primus);
+    client();
   });
 
   it('should join multiple rooms at once passing an array as argument', function (done) {
@@ -122,7 +124,7 @@ describe('primus-rooms', function () {
       });
     });
 
-    client(srv, primus);
+    client();
   });
 
   it('should leave room', function (done) {
@@ -135,7 +137,7 @@ describe('primus-rooms', function () {
       });
     });
 
-    client(srv, primus);
+    client();
   });
 
   it('should leave multiple rooms at once', function (done) {
@@ -150,7 +152,7 @@ describe('primus-rooms', function () {
       });
     });
 
-    client(srv, primus);
+    client();
   });
 
   it('should leave multiple rooms at once passing an array', function (done) {
@@ -165,7 +167,7 @@ describe('primus-rooms', function () {
       });
     });
 
-    client(srv, primus);
+    client();
   });
 
   it('should leave all rooms', function (done) {
@@ -189,7 +191,7 @@ describe('primus-rooms', function () {
       });
     });
 
-    client(srv, primus);
+    client();
   });
 
   // ROOMS DOESNT EXIST
@@ -206,7 +208,7 @@ describe('primus-rooms', function () {
       });
     });
 
-    client(srv, primus);
+    client();
   });
 
   it('should cleanup rooms on leave all', function (done) {
@@ -231,7 +233,7 @@ describe('primus-rooms', function () {
       });
     });
 
-    client(srv, primus);
+    client();
   });
 
   it('should allow method channing', function (done) {
@@ -252,7 +254,7 @@ describe('primus-rooms', function () {
       });
     });
 
-    client(srv, primus);
+    client();
   });
 
   it('should allow simple connection', function (done) {
@@ -262,7 +264,7 @@ describe('primus-rooms', function () {
       });
     });
 
-    var c = client(srv, primus);
+    var c = client();
 
     c.on('data', function (data) {
       if ('send' === data) done();
@@ -288,10 +290,10 @@ describe('primus-rooms', function () {
       });
     });
 
-    var c1 = client(srv, primus)
-      , c2 = client(srv, primus)
-      , c3 = client(srv, primus)
-      , c4 = client(srv, primus);
+    var c1 = client()
+      , c2 = client()
+      , c3 = client()
+      , c4 = client();
 
     c1.on('data', function (msg) {
       expect(msg).to.be('hi');
@@ -345,10 +347,10 @@ describe('primus-rooms', function () {
       });
     });
 
-    var c1 = client(srv, primus)
-      , c2 = client(srv, primus)
-      , c3 = client(srv, primus)
-      , c4 = client(srv, primus);
+    var c1 = client()
+      , c2 = client()
+      , c3 = client()
+      , c4 = client();
 
     c1.on('data', function () {
       done(new Error('Test invalidation'));
@@ -394,10 +396,10 @@ describe('primus-rooms', function () {
       });
     });
 
-    var c1 = client(srv, primus)
-      , c2 = client(srv, primus)
-      , c3 = client(srv, primus)
-      , c4 = client(srv, primus);
+    var c1 = client()
+      , c2 = client()
+      , c3 = client()
+      , c4 = client();
 
     c1.on('data', function () {
       done(new Error('Test invalidation'));
@@ -444,10 +446,10 @@ describe('primus-rooms', function () {
       });
     });
 
-    var c1 = client(srv, primus)
-      , c2 = client(srv, primus)
-      , c3 = client(srv, primus)
-      , c4 = client(srv, primus);
+    var c1 = client()
+      , c2 = client()
+      , c3 = client()
+      , c4 = client();
 
     c1.on('data', function () {
       done(new Error('Test invalidation'));
@@ -487,9 +489,9 @@ describe('primus-rooms', function () {
       });
     });
 
-    var c1 = client(srv, primus)
-      , c2 = client(srv, primus)
-      , c3 = client(srv, primus);
+    var c1 = client()
+      , c2 = client()
+      , c3 = client();
 
     c2.on('data', function (msg) {
       expect(msg).to.be('hi');
@@ -527,10 +529,10 @@ describe('primus-rooms', function () {
       }
     });
 
-    var c1 = client(srv, primus);
+    var c1 = client();
 
     c1.on('open', function () {
-      var c2 = client(srv, primus);
+      var c2 = client();
       c2.on('open', c2.end);
     });
 
@@ -553,11 +555,11 @@ describe('primus-rooms', function () {
       });
     });
 
-    var c = client(srv, primus);
+    var c = client();
 
-    client(srv, primus);
-    client(srv, primus);
-    client(srv, primus);
+    client();
+    client();
+    client();
 
     setTimeout(function () {
       c.write('send');
@@ -577,11 +579,11 @@ describe('primus-rooms', function () {
       });
     });
 
-    var c = client(srv, primus);
+    var c = client();
 
-    client(srv, primus);
-    client(srv, primus);
-    client(srv, primus);
+    client();
+    client();
+    client();
 
     setTimeout(function () {
       c.write('send');
@@ -615,11 +617,11 @@ describe('primus-rooms', function () {
       });
     });
 
-    var c = client(srv, primus);
+    var c = client();
 
-    client(srv, primus);
-    client(srv, primus);
-    client(srv, primus);
+    client();
+    client();
+    client();
 
     setTimeout(function () {
       c.write('send');
@@ -654,11 +656,11 @@ describe('primus-rooms', function () {
       });
     });
 
-    var c = client(srv, primus);
+    var c = client();
 
-    client(srv, primus);
-    client(srv, primus);
-    client(srv, primus);
+    client();
+    client();
+    client();
 
     setTimeout(function () {
       c.write('send');
@@ -682,11 +684,11 @@ describe('primus-rooms', function () {
       });
     });
 
-    var c = client(srv, primus);
+    var c = client();
 
-    client(srv, primus);
-    client(srv, primus);
-    client(srv, primus);
+    client();
+    client();
+    client();
 
     setTimeout(function () {
       c.write('send');
@@ -716,11 +718,11 @@ describe('primus-rooms', function () {
       });
     });
 
-    var c = client(srv, primus);
+    var c = client();
 
-    client(srv, primus);
-    client(srv, primus);
-    client(srv, primus);
+    client();
+    client();
+    client();
 
     setTimeout(function () {
       c.write('send');
@@ -755,7 +757,7 @@ describe('primus-rooms', function () {
       });
     });
 
-    client(srv, primus);
+    client();
   });
 
   it('should return all rooms on server', function (done) {
@@ -775,7 +777,7 @@ describe('primus-rooms', function () {
       });
     });
 
-    client(srv, primus);
+    client();
   });
 
   it('should return all rooms of specific client from server', function (done) {
@@ -793,7 +795,7 @@ describe('primus-rooms', function () {
               primus.rooms(spark.id, function (err, rooms) {
                 if (err) return done(err);
                 expect(rooms).to.eql(['a', 'b']);
-                client(srv, primus);
+                client();
               });
             });
           });
@@ -817,7 +819,7 @@ describe('primus-rooms', function () {
       });
     });
 
-    client(srv, primus);
+    client();
   });
 
   it('should allow passing adapter as argument', function (done) {
@@ -893,7 +895,7 @@ describe('primus-rooms', function () {
       });
     });
 
-    client(srv, primus);
+    client();
   });
 
   it('should get all clients connected to a room using primus method', function (done) {
@@ -913,11 +915,11 @@ describe('primus-rooms', function () {
       });
     });
 
-    var c = client(srv, primus);
+    var c = client();
 
-    client(srv, primus);
-    client(srv, primus);
-    client(srv, primus);
+    client();
+    client();
+    client();
 
     setTimeout(function () {
       c.write('send');
@@ -937,11 +939,11 @@ describe('primus-rooms', function () {
       });
     });
 
-    var c = client(srv, primus);
+    var c = client();
 
-    client(srv, primus);
-    client(srv, primus);
-    client(srv, primus);
+    client();
+    client();
+    client();
 
     setTimeout(function () {
       c.write('send');
@@ -958,7 +960,7 @@ describe('primus-rooms', function () {
       });
     });
 
-    client(srv, primus);
+    client();
   });
 
   it('should join spark to a room by spark id on from primus', function (done) {
@@ -970,7 +972,7 @@ describe('primus-rooms', function () {
       });
     });
 
-    client(srv, primus);
+    client();
   });
 
   it('should join spark to a room with array of ids from primus', function (done) {
@@ -982,7 +984,7 @@ describe('primus-rooms', function () {
       });
     });
 
-    client(srv, primus);
+    client();
   });
 
   it('should join spark to a room with array of spark instances from primus', function (done) {
@@ -994,7 +996,7 @@ describe('primus-rooms', function () {
       });
     });
 
-    client(srv, primus);
+    client();
   });
 
   it('should remove spark from room using primus method', function (done) {
@@ -1009,7 +1011,7 @@ describe('primus-rooms', function () {
       });
     });
 
-    client(srv, primus);
+    client();
   });
 
   it('should remove spark from room by passing spark id, from primus', function (done) {
@@ -1024,7 +1026,7 @@ describe('primus-rooms', function () {
       });
     });
 
-    client(srv, primus);
+    client();
   });
 
   it('should remove spark from room by passing array of instances, from primus', function (done) {
@@ -1039,7 +1041,7 @@ describe('primus-rooms', function () {
       });
     });
 
-    client(srv, primus);
+    client();
   });
 
   it('should remove spark from room by passing array of spark ids, from primus', function (done) {
@@ -1054,7 +1056,7 @@ describe('primus-rooms', function () {
       });
     });
 
-    client(srv, primus);
+    client();
   });
 
   it('should join and leave multiple rooms by spark ids, from primus', function (done) {
@@ -1079,9 +1081,9 @@ describe('primus-rooms', function () {
       }
     });
 
-    client(srv, primus);
-    client(srv, primus);
-    client(srv, primus);
+    client();
+    client();
+    client();
   });
 
   it('should remove spark from room by passing array of sparks, from primus', function (done) {
@@ -1102,9 +1104,9 @@ describe('primus-rooms', function () {
       }
     });
 
-    client(srv, primus);
-    client(srv, primus);
-    client(srv, primus);
+    client();
+    client();
+    client();
   });
 
   it('should broadcast message to specific room from primus using `room`', function (done) {
@@ -1125,9 +1127,9 @@ describe('primus-rooms', function () {
       if (1 > --total) done();
     }
 
-    var c1 = client(srv, primus)
-      , c2 = client(srv, primus)
-      , c3 = client(srv, primus);
+    var c1 = client()
+      , c2 = client()
+      , c3 = client();
 
     c1.on('data', function (msg) {
       expect(msg).to.be('hi');
@@ -1166,9 +1168,9 @@ describe('primus-rooms', function () {
       if (1 > --total) done();
     }
 
-    var c1 = client(srv, primus)
-      , c2 = client(srv, primus)
-      , c3 = client(srv, primus);
+    var c1 = client()
+      , c2 = client()
+      , c3 = client();
 
     c1.on('data', function (msg) {
       expect(msg).to.be('hi');
@@ -1198,7 +1200,7 @@ describe('primus-rooms', function () {
       });
     });
 
-    client(srv, primus);
+    client();
   });
 
   it('should trigger `leaveroom` event when leaving room', function (done) {
@@ -1212,7 +1214,7 @@ describe('primus-rooms', function () {
       });
     });
 
-    client(srv, primus);
+    client();
   });
 
   it('should trigger `leaveallrooms` events on client disconnect', function (done) {
@@ -1225,7 +1227,7 @@ describe('primus-rooms', function () {
       spark.write('end');
     });
 
-    client(srv, primus).on('data', function (data) {
+    client().on('data', function (data) {
       if ('end' === data) this.end();
     });
   });
@@ -1240,7 +1242,7 @@ describe('primus-rooms', function () {
       });
     });
 
-    client(srv, primus);
+    client();
   });
 
   it('should trigger `leaveroom` event when leaving room using primus leave method', function (done) {
@@ -1255,7 +1257,7 @@ describe('primus-rooms', function () {
       });
     });
 
-    client(srv, primus);
+    client();
   });
 
   it('should trigger `leaveallrooms` events on client disconnect when listening on primus', function (done) {
@@ -1273,7 +1275,7 @@ describe('primus-rooms', function () {
       spark.write('end');
     });
 
-    client(srv, primus).on('data', function (data) {
+    client().on('data', function (data) {
       if ('end' === data) this.end();
     });
   });
@@ -1290,9 +1292,9 @@ describe('primus-rooms', function () {
       if (1 > --total) done();
     }
 
-    client(srv, primus).on('data', ondata);
-    client(srv, primus).on('data', ondata);
-    client(srv, primus).on('data', ondata);
+    client().on('data', ondata);
+    client().on('data', ondata);
+    client().on('data', ondata);
   });
 
   describe('wildcards', function () {
@@ -1320,10 +1322,10 @@ describe('primus-rooms', function () {
         }
       }
 
-      var c1 = client(srv, primus)
-        , c2 = client(srv, primus)
-        , c3 = client(srv, primus)
-        , c4 = client(srv, primus);
+      var c1 = client()
+        , c2 = client()
+        , c3 = client()
+        , c4 = client();
 
       c1.on('data', function (msg) {
         expect(msg).to.be('hi');
@@ -1368,9 +1370,9 @@ describe('primus-rooms', function () {
         });
       });
 
-      var c1 = client(srv, primus)
-        , c2 = client(srv, primus)
-        , c3 = client(srv, primus);
+      var c1 = client()
+        , c2 = client()
+        , c3 = client();
 
       c1.on('news', function () {
         done(new Error('Test invalidation'));
@@ -1414,9 +1416,9 @@ describe('primus-rooms', function () {
         }
       }
 
-      var c1 = client(srv, primus)
-        , c2 = client(srv, primus)
-        , c3 = client(srv, primus);
+      var c1 = client()
+        , c2 = client()
+        , c3 = client();
 
       c1.on('data', function (msg) {
         expect(msg).to.be('hi');
@@ -1459,9 +1461,9 @@ describe('primus-rooms', function () {
           });
         });
 
-        var c1 = client(srv, primus)
-          , c2 = client(srv, primus)
-          , c3 = client(srv, primus);
+        var c1 = client()
+          , c2 = client()
+          , c3 = client();
 
         c1.on('data', function (msg) {
           expect(msg).to.be('hi');
@@ -1501,7 +1503,7 @@ describe('primus-rooms', function () {
         });
       });
 
-      var c = client(srv, primus);
+      var c = client();
 
       c.on('open', function () {
         events.forEach(function (ev) {
@@ -1521,9 +1523,9 @@ describe('primus-rooms', function () {
         });
       });
 
-      var c1 = client(srv, primus)
-        , c2 = client(srv, primus)
-        , c3 = client(srv, primus);
+      var c1 = client()
+        , c2 = client()
+        , c3 = client();
 
       c1.on('msg', function () {
         done();
@@ -1569,10 +1571,10 @@ describe('primus-rooms', function () {
         if (1 > --total) done();
       }
 
-      var c1 = client(srv, primus)
-        , c2 = client(srv, primus)
-        , c3 = client(srv, primus)
-        , c4 = client(srv, primus);
+      var c1 = client()
+        , c2 = client()
+        , c3 = client()
+        , c4 = client();
 
       c1.on('msg', function (msg) {
         expect(msg).to.be('hi');
@@ -1606,7 +1608,7 @@ describe('primus-rooms', function () {
         });
       });
 
-      client(srv, primus).on('news', function () {
+      client().on('news', function () {
         done();
       });
     });
@@ -1621,7 +1623,7 @@ describe('primus-rooms', function () {
         });
       });
 
-      client(srv, primus).on('news', function () {
+      client().on('news', function () {
         done();
       });
     });
@@ -1644,10 +1646,10 @@ describe('primus-rooms', function () {
         if (1 > --total) done();
       }
 
-      var c1 = client(srv, primus)
-        , c2 = client(srv, primus)
-        , c3 = client(srv, primus)
-        , c4 = client(srv, primus);
+      var c1 = client()
+        , c2 = client()
+        , c3 = client()
+        , c4 = client();
 
       c1.on('msg', function (msg) {
         expect(msg).to.be('hi');
@@ -1696,10 +1698,10 @@ describe('primus-rooms', function () {
         if (1 > --total) done();
       }
 
-      var c1 = client(srv, primus)
-        , c2 = client(srv, primus)
-        , c3 = client(srv, primus)
-        , c4 = client(srv, primus);
+      var c1 = client()
+        , c2 = client()
+        , c3 = client()
+        , c4 = client();
 
       c1.on('data', function (msg) {
         expect(msg).to.be('hi');
@@ -1740,9 +1742,9 @@ describe('primus-rooms', function () {
         if (1 > --total) done();
       }
 
-      client(srv, primus).on('msg', onmsg);
-      client(srv, primus).on('msg', onmsg);
-      client(srv, primus).on('msg', onmsg);
+      client().on('msg', onmsg);
+      client().on('msg', onmsg);
+      client().on('msg', onmsg);
     });
   });
 
@@ -1760,7 +1762,7 @@ describe('primus-rooms', function () {
         });
       });
 
-      client(srv, primus).channel('a');
+      client().channel('a');
     });
 
     it('should allow leaving a room', function (done) {
@@ -1773,7 +1775,7 @@ describe('primus-rooms', function () {
         });
       });
 
-      client(srv, primus).channel('a');
+      client().channel('a');
     });
 
     it('should allow broadcasting a message to a client', function (done) {
@@ -1789,7 +1791,7 @@ describe('primus-rooms', function () {
         });
       });
 
-      var c = client(srv, primus)
+      var c = client()
         , ch1 = c.channel('a')
         , ch2 = c.channel('a');
 
@@ -1819,7 +1821,7 @@ describe('primus-rooms', function () {
         if (1 > --total) done();
       }
 
-      var c = client(srv, primus)
+      var c = client()
         , ch1 = c.channel('a')
         , ch2 = c.channel('a')
         , ch3 = c.channel('a')
@@ -1867,7 +1869,7 @@ describe('primus-rooms', function () {
         if (1 > --total) done();
       }
 
-      var c = client(srv, primus)
+      var c = client()
         , ch1 = c.channel('a')
         , ch2 = c.channel('a')
         , ch3 = c.channel('a')
@@ -1917,7 +1919,7 @@ describe('primus-rooms', function () {
         if (1 > --total) done();
       }
 
-      var c = client(srv, primus)
+      var c = client()
         , ch1 = c.channel('a')
         , ch2 = c.channel('a')
         , ch3 = c.channel('a')
@@ -1966,7 +1968,7 @@ describe('primus-rooms', function () {
         });
       });
 
-      var c = client(srv, primus)
+      var c = client()
         , ch1 = c.channel('a')
         , ch2 = c.channel('a');
 
@@ -1999,7 +2001,7 @@ describe('primus-rooms', function () {
         if (1 > --total) done();
       }
 
-      var c = client(srv, primus)
+      var c = client()
         , ch1 = c.channel('a')
         , ch2 = c.channel('a')
         , ch3 = c.channel('a')
@@ -2045,7 +2047,7 @@ describe('primus-rooms', function () {
         }
       });
 
-      var c = client(srv, primus);
+      var c = client();
       c.channel('a');
       c.channel('a');
       c.channel('a');
@@ -2063,7 +2065,7 @@ describe('primus-rooms', function () {
         });
       });
 
-      client(srv, primus).channel('a');
+      client().channel('a');
     });
 
     it('should remove spark form room using channel method', function (done) {
@@ -2080,7 +2082,7 @@ describe('primus-rooms', function () {
         });
       });
 
-      client(srv, primus).channel('a');
+      client().channel('a');
     });
 
     it('should trigger `joinroom` event when joining room', function (done) {
@@ -2094,7 +2096,7 @@ describe('primus-rooms', function () {
         });
       });
 
-      client(srv, primus).channel('a');
+      client().channel('a');
     });
 
     it('should trigger `leaveroom` event when leaving room', function (done) {
@@ -2110,7 +2112,7 @@ describe('primus-rooms', function () {
         });
       });
 
-      client(srv, primus).channel('a');
+      client().channel('a');
     });
 
     it('should trigger `leaveallrooms` events on client disconnect', function (done) {
@@ -2129,7 +2131,7 @@ describe('primus-rooms', function () {
         spark.write('end');
       });
 
-      var c = client(srv, primus)
+      var c = client()
         , ch = c.channel('a');
 
       ch.on('data', function (data) {
@@ -2149,7 +2151,7 @@ describe('primus-rooms', function () {
         });
       });
 
-      client(srv, primus).channel('a');
+      client().channel('a');
     });
 
     it('should trigger `leaveroom` event when leaving room using channel leave method', function (done) {
@@ -2166,7 +2168,7 @@ describe('primus-rooms', function () {
         });
       });
 
-      client(srv, primus).channel('a');
+      client().channel('a');
     });
   });
 });
