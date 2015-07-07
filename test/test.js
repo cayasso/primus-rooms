@@ -1123,7 +1123,8 @@ describe('primus-rooms', function () {
       });
     });
 
-    function finish () {
+    function ondata(msg) {
+      expect(msg).to.be('hi');
       if (1 > --total) done();
     }
 
@@ -1131,16 +1132,8 @@ describe('primus-rooms', function () {
       , c2 = client()
       , c3 = client();
 
-    c1.on('data', function (msg) {
-      expect(msg).to.be('hi');
-      finish();
-    });
-
-    c2.on('data', function (msg) {
-      expect(msg).to.be('hi');
-      finish();
-    });
-
+    c1.on('data', ondata);
+    c2.on('data', ondata);
     c3.on('data', function () {
       done(new Error('Test invalidation'));
     });
@@ -1164,7 +1157,8 @@ describe('primus-rooms', function () {
       });
     });
 
-    function finish () {
+    function ondata(msg) {
+      expect(msg).to.be('hi');
       if (1 > --total) done();
     }
 
@@ -1172,16 +1166,8 @@ describe('primus-rooms', function () {
       , c2 = client()
       , c3 = client();
 
-    c1.on('data', function (msg) {
-      expect(msg).to.be('hi');
-      finish();
-    });
-
-    c2.on('data', function (msg) {
-      expect(msg).to.be('hi');
-      finish();
-    });
-
+    c1.on('data', ondata);
+    c2.on('data', ondata);
     c3.on('data', function () {
       done(new Error('Test invalidation'));
     });
@@ -1316,7 +1302,8 @@ describe('primus-rooms', function () {
         });
       });
 
-      function finish () {
+      function ondata(msg) {
+        expect(msg).to.be('hi');
         if (1 > --total) {
           primus.empty(['send', 'user:*', 'user:*:abc', 'user:123:abc'], done);
         }
@@ -1327,21 +1314,9 @@ describe('primus-rooms', function () {
         , c3 = client()
         , c4 = client();
 
-      c1.on('data', function (msg) {
-        expect(msg).to.be('hi');
-        finish();
-      });
-
-      c2.on('data', function (msg) {
-        expect(msg).to.be('hi');
-        finish();
-      });
-
-      c3.on('data', function (msg) {
-        expect(msg).to.be('hi');
-        finish();
-      });
-
+      c1.on('data', ondata);
+      c2.on('data', ondata);
+      c3.on('data', ondata);
       c4.on('data', function () {
         done(new Error('Test invalidation'));
       });
@@ -1410,7 +1385,8 @@ describe('primus-rooms', function () {
         });
       });
 
-      function finish () {
+      function ondata(msg) {
+        expect(msg).to.be('hi');
         if (1 > --total) {
           primus.empty('send user:*:* user:*:abc', done);
         }
@@ -1420,16 +1396,8 @@ describe('primus-rooms', function () {
         , c2 = client()
         , c3 = client();
 
-      c1.on('data', function (msg) {
-        expect(msg).to.be('hi');
-        finish();
-      });
-
-      c2.on('data', function (msg) {
-        expect(msg).to.be('hi');
-        finish();
-      });
-
+      c1.on('data', ondata);
+      c2.on('data', ondata);
       c3.on('data', function () {
         done(new Error('Test invalidation'));
       });
@@ -1437,6 +1405,35 @@ describe('primus-rooms', function () {
       c1.write('user:*:*');
       c2.write('user:*:abc');
       c3.write('send');
+    });
+
+    it('should allow wildcard deletes', function (done) {
+      primus.end();
+      srv = http();
+      primus = server(srv, { rooms: { wildDelete: false } });
+      srv.listen(function () {
+        primus.on('connection', function (spark) {          
+          spark.join('*:*:*', function () {
+            spark.join('a:*:*', function () {
+              spark.join('a:b:*', function () {
+                spark.join('*:*:c', function () {
+                  spark.join('*:b:c', function () {
+                    spark.join('a:b:c', function () {
+                      spark.leave('*:*:*', function () {
+                        spark.rooms(function (err, rooms) {
+                          expect(rooms).to.be.empty;
+                          done();
+                        });
+                      });
+                    });
+                  });
+                });
+              });
+            });
+          });
+        });
+        client();
+      });
     });
 
     it('should allow to disable wildcard', function (done) {
@@ -1567,7 +1564,8 @@ describe('primus-rooms', function () {
         });
       });
 
-      function finish() {
+      function onmsg(msg) {
+        expect(msg).to.be('hi');
         if (1 > --total) done();
       }
 
@@ -1576,21 +1574,9 @@ describe('primus-rooms', function () {
         , c3 = client()
         , c4 = client();
 
-      c1.on('msg', function (msg) {
-        expect(msg).to.be('hi');
-        finish();
-      });
-
-      c2.on('msg', function (msg) {
-        expect(msg).to.be('hi');
-        finish();
-      });
-
-      c3.on('msg', function (msg) {
-        expect(msg).to.be('hi');
-        finish();
-      });
-
+      c1.on('msg', onmsg);
+      c2.on('msg', onmsg);
+      c3.on('msg', onmsg);
       c4.on('msg', function () {
         done(new Error('Test invalidation'));
       });
@@ -1642,7 +1628,8 @@ describe('primus-rooms', function () {
         });
       });
 
-      function finish() {
+      function onmsg(msg) {
+        expect(msg).to.be('hi');
         if (1 > --total) done();
       }
 
@@ -1651,21 +1638,9 @@ describe('primus-rooms', function () {
         , c3 = client()
         , c4 = client();
 
-      c1.on('msg', function (msg) {
-        expect(msg).to.be('hi');
-        finish();
-      });
-
-      c2.on('msg', function (msg) {
-        expect(msg).to.be('hi');
-        finish();
-      });
-
-      c3.on('msg', function (msg) {
-        expect(msg).to.be('hi');
-        finish();
-      });
-
+      c1.on('msg', onmsg);
+      c2.on('msg', onmsg);
+      c3.on('msg', onmsg);
       c4.on('msg', function () {
         done(new Error('Test invalidation'));
       });
@@ -1694,7 +1669,8 @@ describe('primus-rooms', function () {
         });
       });
 
-      function finish() {
+      function onmsg(msg) {
+        expect(msg).to.be('hi');
         if (1 > --total) done();
       }
 
@@ -1703,21 +1679,9 @@ describe('primus-rooms', function () {
         , c3 = client()
         , c4 = client();
 
-      c1.on('data', function (msg) {
-        expect(msg).to.be('hi');
-        finish();
-      });
-
-      c2.on('data', function (msg) {
-        expect(msg).to.be('hi');
-        finish();
-      });
-
-      c3.on('data', function (msg) {
-        expect(msg).to.be('hi');
-        finish();
-      });
-
+      c1.on('data', onmsg);
+      c2.on('data', onmsg);
+      c3.on('data', onmsg);
       c4.on('data', function () {
         done(new Error('Test invalidation'));
       });
