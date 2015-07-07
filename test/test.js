@@ -2,42 +2,21 @@
 
 var rooms = require('../')
   , Primus = require('primus')
-  // , redis = require('redis')
   , http = require('http').Server
   , expect = require('expect.js')
-  , port = 1111
-  , opts = {
-      transformer: 'websockets',
-      // redis: {
-      //   createClient: redis.createClient.bind(redis),
-      //   rooms: {
-      //     ttl: 2000 // Optional, defaults to `86400000` (one day).
-      //   }
-      // }
-    }
+  , opts = { transformer: 'websockets' }
   , srv, primus;
-
-// port getter
-Object.defineProperty(client, 'port', {
-  get: function () {
-    return port++;
-  }
-});
 
 // creates the client
 function client() {
   var addr = srv.address();
-
   if (!addr) throw new Error('Server is not listening');
-
   return new primus.Socket('http://localhost:' + addr.port);
 }
 
 // creates the server
 function server(srv, opts) {
-  return new Primus(srv, opts)
-    .use('rooms', rooms)
-    // .use('redis', 'primus-redis');
+  return new Primus(srv, opts).use('rooms', rooms);
 }
 
 describe('primus-rooms', function () {
@@ -45,18 +24,10 @@ describe('primus-rooms', function () {
     srv = http();
     primus = server(srv, opts);
     srv.listen(done);
-
-    // primus.adapter().client.del('primus', function(){
-    //   done();
-    // });
   });
 
   afterEach(function afterEach(done) {
     primus.end(done);
-
-    // primus.adapter().client.del('primus', function(){
-    //   done();
-    // });
   });
 
   it('should have required methods', function (done) {
@@ -1669,7 +1640,7 @@ describe('primus-rooms', function () {
         });
       });
 
-      function onmsg(msg) {
+      function data(msg) {
         expect(msg).to.be('hi');
         if (1 > --total) done();
       }
@@ -1679,9 +1650,9 @@ describe('primus-rooms', function () {
         , c3 = client()
         , c4 = client();
 
-      c1.on('data', onmsg);
-      c2.on('data', onmsg);
-      c3.on('data', onmsg);
+      c1.on('data', data);
+      c2.on('data', data);
+      c3.on('data', data);
       c4.on('data', function () {
         done(new Error('Test invalidation'));
       });
@@ -1879,7 +1850,8 @@ describe('primus-rooms', function () {
         });
       });
 
-      function finish() {
+      function onmsg(msg) {
+        expect(msg).to.be('hi');
         if (1 > --total) done();
       }
 
@@ -1889,21 +1861,9 @@ describe('primus-rooms', function () {
         , ch3 = c.channel('a')
         , ch4 = c.channel('a');
 
-      ch1.on('msg', function (msg) {
-        expect(msg).to.be('hi');
-        finish();
-      });
-
-      ch2.on('msg', function (msg) {
-        expect(msg).to.be('hi');
-        finish();
-      });
-
-      ch3.on('msg', function (msg) {
-        expect(msg).to.be('hi');
-        finish();
-      });
-
+      ch1.on('msg', onmsg);
+      ch2.on('msg', onmsg);
+      ch3.on('msg', onmsg);
       ch4.on('msg', function () {
         done(new Error('Test invalidation'));
       });
@@ -1961,7 +1921,8 @@ describe('primus-rooms', function () {
         });
       });
 
-      function finish() {
+      function onmsg(msg) {
+        expect(msg).to.be('hi');
         if (1 > --total) done();
       }
 
@@ -1971,21 +1932,9 @@ describe('primus-rooms', function () {
         , ch3 = c.channel('a')
         , ch4 = c.channel('a');
 
-      ch1.on('msg', function (msg) {
-        expect(msg).to.be('hi');
-        finish();
-      });
-
-      ch2.on('msg', function (msg) {
-        expect(msg).to.be('hi');
-        finish();
-      });
-
-      ch3.on('msg', function (msg) {
-        expect(msg).to.be('hi');
-        finish();
-      });
-
+      ch1.on('msg', onmsg);
+      ch2.on('msg', onmsg);
+      ch3.on('msg', onmsg);
       ch4.on('msg', function () {
         done(new Error('Test invalidation'));
       });
