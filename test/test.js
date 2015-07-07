@@ -1752,7 +1752,8 @@ describe('primus-rooms', function () {
         });
       });
 
-      function finish() {
+      function ondata(msg) {
+        expect(msg).to.be('hi');
         if (1 > --total) done();
       }
 
@@ -1762,21 +1763,9 @@ describe('primus-rooms', function () {
         , ch3 = c.channel('a')
         , ch4 = c.channel('a');
 
-      ch1.on('data', function (msg) {
-        expect(msg).to.be('hi');
-        finish();
-      });
-
-      ch2.on('data', function (msg) {
-        expect(msg).to.be('hi');
-        finish();
-      });
-
-      ch3.on('data', function (msg) {
-        expect(msg).to.be('hi');
-        finish();
-      });
-
+      ch1.on('data', ondata);
+      ch2.on('data', ondata);
+      ch3.on('data', ondata);
       ch4.on('data', function () {
         done(new Error('Test invalidation'));
       });
@@ -1800,7 +1789,8 @@ describe('primus-rooms', function () {
         });
       });
 
-      function finish() {
+      function ondata(msg) {
+        expect(msg).to.be('hi');
         if (1 > --total) done();
       }
 
@@ -1810,21 +1800,9 @@ describe('primus-rooms', function () {
         , ch3 = c.channel('a')
         , ch4 = c.channel('a');
 
-      ch1.on('data', function (msg) {
-        expect(msg).to.be('hi');
-        finish();
-      });
-
-      ch2.on('data', function (msg) {
-        expect(msg).to.be('hi');
-        finish();
-      });
-
-      ch3.on('data', function (msg) {
-        expect(msg).to.be('hi');
-        finish();
-      });
-
+      ch1.on('data', ondata);
+      ch2.on('data', ondata);
+      ch3.on('data', ondata);
       ch4.on('data', function () {
         done(new Error('Test invalidation'));
       });
