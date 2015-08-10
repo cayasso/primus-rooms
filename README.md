@@ -525,6 +525,39 @@ var clients = spark.room('room').clients();
 console.log(clients);
 ```
 
+### spark.room(name).transform(fn);
+
+```javascript
+spark.room('room').transform(function transform(packet) {
+  var spark = this;
+  if (spark.user.name === 'John Doe') {
+    packet.data[0] = 'hi ' + spark.user.name;
+  }
+
+  // If you want to prevent the `data` event from happening, 
+  // simply `return false` and the event won't be send.
+
+}).write('hi');
+```
+
+This also work asynchronously:
+
+```javascript
+spark.room('room').transform(function transform(packet, done) {
+  var spark = this;
+  if (spark.user.name === 'John Doe') {
+    setTimeout(function () {
+      packet.data[0] = 'hi ' + spark.user.name;
+      done();
+    });
+  }
+
+  // If you want to prevent the `data` event from happening, 
+  // simply do `next(undefined, false)` and the event won't be send.
+
+}).write('hi');
+```
+
 ### spark.leave(name, [fn])
 
 Leave a specific `room`, `fn` is optional callback.
