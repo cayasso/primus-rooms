@@ -445,6 +445,179 @@ describe('primus-rooms', function () {
     c4.write('send');
   });
 
+  it('should allow transforming data before broadcasting from client', function (done) {
+    var total = 0
+      , sender;
+
+    primus.on('connection', function (spark) {
+      spark.on('data', function (data) {
+
+        spark.from = data;
+
+        if ('send' === data) {
+          sender = spark;
+        }
+        spark.join(data, function () {
+          ++total;
+          if (3 === total) {
+            --total;
+            sender.in('room1 room2').transform(function (packet) {
+              var socket = this;
+              packet.data[0] = 'hi from ' + socket.from;
+            }).write('hi');
+          }
+        });
+      });
+    });
+
+    var c1 = client()
+      , c2 = client()
+      , c3 = client();
+
+    c1.on('data', function (msg) {
+      expect(msg).to.be('hi from room1');
+    });
+
+    c2.on('data', function (msg) {
+      expect(msg).to.be('hi from room2');
+      primus.empty('room1 room2', done);
+    });
+
+    c1.write('room1');
+
+    setTimeout(function () {
+      c2.write('room2');
+      c3.write('send');
+    }, 50);
+  });
+
+  it('should allow transforming data asynchronously before broadcasting from client', function (done) {
+    var total = 0
+      , sender;
+
+    primus.on('connection', function (spark) {
+      spark.on('data', function (data) {
+        spark.from = data;
+
+        if ('send' === data) {
+          sender = spark;
+        }
+        spark.join(data, function () {
+          ++total;
+          if (3 === total) {
+            --total;
+            sender.in('room1 room2').transform(function (packet, next) {
+              var socket = this;
+              setTimeout(function () {
+                packet.data[0] = 'hi from ' + socket.from;
+                next();
+              }, 100);
+            }).write('hi');
+          }
+        });
+      });
+    });
+
+    var c1 = client()
+      , c2 = client()
+      , c3 = client();
+
+    c1.on('data', function (msg) {
+      expect(msg).to.be('hi from room1');
+    });
+
+    c2.on('data', function (msg) {
+      expect(msg).to.be('hi from room2');
+      primus.empty('room1 room2', done);
+    });
+
+    c1.write('room1');
+
+    setTimeout(function () {
+      c2.write('room2');
+      c3.write('send');
+    }, 50);
+  });
+
+  it('should allow transforming data before broadcasting from server', function (done) {
+    var total = 0;
+
+    primus.on('connection', function (spark) {
+      spark.on('data', function (data) {
+        spark.from = data;
+        spark.join(data, function () {
+          ++total;
+          if (2 === total) {
+            --total;
+            primus.in('room1 room2').transform(function (packet) {
+              var socket = this;
+              packet.data[0] = 'hi from ' + socket.from;
+            }).write('hi');
+          }
+        });
+      });
+    });
+
+    var c1 = client()
+      , c2 = client();
+
+    c1.on('data', function (msg) {
+      expect(msg).to.be('hi from room1');
+    });
+
+    c2.on('data', function (msg) {
+      expect(msg).to.be('hi from room2');
+      primus.empty('room1 room2', done);
+    });
+
+    c1.write('room1');
+
+    setTimeout(function () {
+      c2.write('room2');
+    }, 50);
+  });
+
+  it('should allow transforming asynchronously data before broadcasting from server', function (done) {
+    var total = 0;
+
+    primus.on('connection', function (spark) {
+      spark.on('data', function (data) {
+        spark.from = data;
+        spark.join(data, function () {
+          ++total;
+          if (2 === total) {
+            --total;
+            primus.in('room1 room2').transform(function (packet, next) {
+              var socket = this;
+              setTimeout(function () {
+                packet.data[0] = 'hi from ' + socket.from;
+                next();
+              }, 100);
+            }).write('hi');
+          }
+        });
+      });
+    });
+
+    var c1 = client()
+      , c2 = client();
+
+    c1.on('data', function (msg) {
+      expect(msg).to.be('hi from room1');
+    });
+
+    c2.on('data', function (msg) {
+      expect(msg).to.be('hi from room2');
+      primus.empty('room1 room2', done);
+    });
+
+    c1.write('room1');
+
+    setTimeout(function () {
+      c2.write('room2');
+    }, 50);
+  });
+
   it('should avoid sending dupes', function (done) {
     var total = 2;
 
