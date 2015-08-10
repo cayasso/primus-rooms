@@ -1,6 +1,6 @@
 {
   "name": "primus-rooms",
-  "version": "3.2.0",
+  "version": "3.3.0",
   "description": "Simple rooms wrapper for Primus",
   "author": "Jonathan Brumley <cayasso@gmail.com>",
   "homepage": "https://github.com/cayasso/primus-rooms",
