@@ -345,6 +345,39 @@ primus.room('news sport').empty();
 primus.empty('news sport');
 ```
 
+### primus.room(name).transform(fn);
+
+```javascript
+primus.room('room').transform(function transform(packet) {
+  var spark = this;
+  if (spark.user.name === 'John Doe') {
+    packet.data[0] = 'hi ' + spark.user.name;
+  }
+
+  // If you want to prevent the `data` event from happening, 
+  // simply `return false` and the event won't be send.
+
+}).write('hi');
+```
+
+This also work asynchronously:
+
+```javascript
+primus.room('room').transform(function transform(packet, done) {
+  var spark = this;
+  if (spark.user.name === 'John Doe') {
+    setTimeout(function () {
+      packet.data[0] = 'hi ' + spark.user.name;
+      done();
+    });
+  }
+
+  // If you want to prevent the `data` event from happening, 
+  // simply do `next(undefined, false)` and the event won't be send.
+
+}).write('hi');
+```
+
 ### primus.rooms([spark], [fn])
 
 Get all active rooms on the server.
