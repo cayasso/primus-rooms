@@ -265,7 +265,7 @@ This is also equivalent:
 primus.leave('1389028863093$0', 'news', fn);
 ```
 
-### primus.room(spark, name, [fn])
+### primus.room(room)
 
 Target a specific `room` or rooms for broadcasting a message.
 
@@ -354,8 +354,8 @@ primus.room('room').transform(function transform(packet) {
     packet.data[0] = 'hi ' + spark.user.name;
   }
 
-  // If you want to prevent the `data` event from happening, 
-  // simply `return false` and the event won't be send.
+  // If you want to prevent the `data` event from happening,
+  // simply `return false` and the event won't be sent.
 
 }).write('hi');
 ```
@@ -372,8 +372,8 @@ primus.room('room').transform(function transform(packet, done) {
     });
   }
 
-  // If you want to prevent the `data` event from happening, 
-  // simply do `next(undefined, false)` and the event won't be send.
+  // If you want to prevent the `data` event from happening,
+  // simply do `done(undefined, false)` and the event won't be sent.
 
 }).write('hi');
 ```
@@ -468,7 +468,7 @@ Join multiple rooms at once.
 spark.join('room1 room2 room3', fn);
 ```
 
-### spark.room(name, [fn])
+### spark.room(room)
 
 Target a specific `room`.
 
@@ -534,8 +534,8 @@ spark.room('room').transform(function transform(packet) {
     packet.data[0] = 'hi ' + spark.user.name;
   }
 
-  // If you want to prevent the `data` event from happening, 
-  // simply `return false` and the event won't be send.
+  // If you want to prevent the `data` event from happening,
+  // simply `return false` and the event won't be sent.
 
 }).write('hi');
 ```
@@ -552,8 +552,8 @@ spark.room('room').transform(function transform(packet, done) {
     });
   }
 
-  // If you want to prevent the `data` event from happening, 
-  // simply do `next(undefined, false)` and the event won't be send.
+  // If you want to prevent the `data` event from happening,
+  // simply do `done(undefined, false)` and the event won't be sent.
 
 }).write('hi');
 ```
