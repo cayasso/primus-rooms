@@ -618,6 +618,31 @@ describe('primus-rooms', function () {
     }, 50);
   });
 
+  it('should remove the transformer function after broadcasting', function (done) {
+    var room;
+
+    primus.on('connection', function (spark) {
+      spark.on('data', function (data) {
+        spark.join(data, function () {
+          room = spark.room('foo');
+
+          room.transform(function (packet) {
+            packet.data[0] = 'baz';
+          });
+
+          room.write('bar');
+
+          expect(room.__transformer).to.be(null);
+        });
+      });
+    });
+
+    client().on('data', function (msg) {
+      expect(msg).to.be('baz');
+      primus.empty('foo', done);
+    }).write('foo');
+  });
+
   it('should avoid sending dupes', function (done) {
     var total = 2;
 
