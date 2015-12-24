@@ -6,9 +6,11 @@ node_js:
   - "0.10"
   - "0.12"
   - "iojs"
+  - "4"
+  - "5"
 before_install:
-  - 'if [ "${TRAVIS_NODE_VERSION}" == "0.8" ] ; then npm install -g npm@2.7.1; fi'
+  - 'if [ "${TRAVIS_NODE_VERSION}" == "0.8" ] ; then npm install -g npm@2.14.14; fi'
 script:
   - "make test-travis"
 after_script:
-  - "npm install coveralls@2.11.x && cat coverage/lcov.info | coveralls"
+  - "npm install coveralls@2 && cat coverage/lcov.info | coveralls"
