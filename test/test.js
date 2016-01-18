@@ -718,7 +718,7 @@ describe('primus-rooms', function () {
       spark.join('news');
       spark.on('data', function () {
         spark.room('news').clients(function (err, clients) {
-          expect(clients.sort()).to.be.eql(ids);
+          expect(clients.sort()).to.be.eql(ids.sort());
           primus.empty(['news'], done);
         });
       });
@@ -743,7 +743,7 @@ describe('primus-rooms', function () {
       spark.join('room1');
       spark.on('data', function () {
         var clients = spark.room('room1').clients();
-        expect(clients.sort()).to.be.eql(ids);
+        expect(clients.sort()).to.be.eql(ids.sort());
         done();
       });
     });
