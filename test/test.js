@@ -60,6 +60,21 @@ describe('primus-rooms', function () {
     client();
   });
 
+  it('should prevent closed sparks from joining rooms', function (done) {
+    primus.on('connection', function (spark) {
+      spark.on('end', function () {
+        spark.join('room1', function (err) {
+          expect(err).to.be.an(Error);
+          expect(err.message).to.be('Spark is closed');
+          done();
+        });
+      });
+      spark.end();
+    });
+
+    client();
+  });
+
   it('should join multiple rooms at once', function (done) {
     primus.on('connection', function (spark) {
       spark.join('room1 room2 room3', function () {
