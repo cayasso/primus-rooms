@@ -1051,22 +1051,6 @@ describe('primus-rooms', function () {
     throw new Error('Test invalidation');
   });
 
-  it('should destroy references to instance', function (done) {
-    primus.on('connection', function (spark) {
-      var rms = spark._rooms;
-      spark._rooms.destroy(function () {
-        expect(spark._rooms).to.be(undefined);
-        expect(rms.primus).to.be(undefined);
-        expect(rms.ctx).to.be(undefined);
-        expect(rms.id).to.be(undefined);
-        spark.removeListener('end', rms.onend);
-        done();
-      });
-    });
-
-    client();
-  });
-
   it('should get all clients connected to a room using primus method', function (done) {
     var ids = [];
 
