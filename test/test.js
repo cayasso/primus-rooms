@@ -63,6 +63,10 @@ describe('primus-rooms', function () {
   it('should prevent closed sparks from joining rooms', function (done) {
     primus.on('connection', function (spark) {
       spark.on('end', function () {
+        expect(spark.join.bind(spark, 'room1')).to.throwException(function (err) {
+          expect(err).to.be.an(Error);
+          expect(err.message).to.be('Spark is closed');
+        });
         spark.join('room1', function (err) {
           expect(err).to.be.an(Error);
           expect(err.message).to.be('Spark is closed');
