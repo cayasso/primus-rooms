@@ -29,7 +29,7 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "async": "^2.0.0-rc.4",
+    "async": "2.0.x",
     "debug": "2.2.x",
     "primus-rooms-adapter": "0.3.x"
   },
