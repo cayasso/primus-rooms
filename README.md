@@ -25,7 +25,7 @@ var server = require('http').createServer();
 var primus = new Primus(server, { transformer: 'websockets' });
 
 // add rooms to Primus
-primus.use('rooms', Rooms);
+primus.plugin('rooms', Rooms);
 
 primus.on('connection', function (spark) {
 
@@ -165,7 +165,7 @@ var server = require('http').createServer();
 var primus = new Primus(server, { rooms: { wildcard: false } });
 
 // add rooms to Primus
-primus.use('rooms', Rooms);
+primus.plugin('rooms', Rooms);
 ```
 
 For more examples on how to use `wildcard` check the wildcard tests.
@@ -183,7 +183,7 @@ var primus = new Primus(url, {
   transformer: 'sockjs',
   rooms: { adapter: myAdapter }
 });
-primus.use('rooms', Rooms);
+primus.plugin('rooms', Rooms);
 
 // by setting the property
 primus.adapter = new MyAdapter();
