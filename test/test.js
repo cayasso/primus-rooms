@@ -16,7 +16,7 @@ function client() {
 
 // creates the server
 function server(srv, opts) {
-  return new Primus(srv, opts).use('rooms', rooms);
+  return new Primus(srv, opts).plugin('rooms', rooms);
 }
 
 describe('primus-rooms', function () {
@@ -1499,7 +1499,7 @@ describe('primus-rooms', function () {
       var total = 0
         , sender;
 
-      primus.use('emitter', 'primus-emitter');
+      primus.plugin('emitter', 'primus-emitter');
       primus.on('connection', function (spark) {
         spark.on('msg', function (data) {
           if ('send' === data) {
@@ -1652,7 +1652,7 @@ describe('primus-rooms', function () {
 
   describe('primus-emitter', function () {
     beforeEach(function () {
-      primus.use('emitter', 'primus-emitter');
+      primus.plugin('emitter', 'primus-emitter');
     });
 
     it('should ignore `primus-rooms` reserved events', function (done) {
@@ -1882,7 +1882,7 @@ describe('primus-rooms', function () {
 
   describe('primus-multiplex', function () {
     beforeEach(function () {
-      primus.use('multiplex', 'primus-multiplex');
+      primus.plugin('multiplex', 'primus-multiplex');
     });
 
     it('should allow joining a room', function (done) {
@@ -2011,7 +2011,7 @@ describe('primus-rooms', function () {
     });
 
     it('should allow broadcasting a message to multiple clients with channel `send` method', function (done) {
-      primus.use('emitter', 'primus-emitter');
+      primus.plugin('emitter', 'primus-emitter');
 
       var a = primus.channel('a')
         , total = 3;
@@ -2050,7 +2050,7 @@ describe('primus-rooms', function () {
     });
 
     it('should allow broadcasting a message to a client with emitter', function (done) {
-      primus.use('emitter', 'primus-emitter');
+      primus.plugin('emitter', 'primus-emitter');
 
       var a = primus.channel('a');
 
@@ -2081,7 +2081,7 @@ describe('primus-rooms', function () {
     });
 
     it('should allow broadcasting a message to multiple clients with emitter', function (done) {
-      primus.use('emitter', 'primus-emitter');
+      primus.plugin('emitter', 'primus-emitter');
 
       var a = primus.channel('a')
         , total = 3;
