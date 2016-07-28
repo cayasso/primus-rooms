@@ -39,7 +39,7 @@
     "matcha": "^0.7.0",
     "mocha": "^2.4.5",
     "pre-commit": "^1.1.3",
-    "primus": "^5.2.1",
+    "primus": "^6.0.0",
     "primus-emitter": "^3.1.1",
     "primus-multiplex": "^3.2.0",
     "ws": "^1.1.0"
