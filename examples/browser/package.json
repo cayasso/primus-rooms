@@ -1,11 +1,11 @@
 {
-  "name": "primus.io-example",
+  "name": "primus-rooms-test",
   "version": "0.0.0",
   "author": "Jonathan Brumley <cayasso@gmail.com>",
   "main": "index.js",
   "license": "MIT",
   "dependencies": {
-    "primus": "1.0.x",
-    "ws": "~0.4.27"
+    "primus": "^6.0.0",
+    "ws": "^1.1.1"
   }
 }

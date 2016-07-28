@@ -1,4 +1,3 @@
-
 var rooms = require('../../')
   , Primus = require('primus')
   , http = require('http')
@@ -11,11 +10,11 @@ var server = http.createServer(function server(req, res) {
 
 
 // Primus server.
-var primus = new Primus(server, { transformer: 'websockets', parser: 'JSON' });
+var primus = new Primus(server);
 
 
 // add rooms to Primus
-primus.use('rooms', rooms);
+primus.plugin('rooms', rooms);
 
 var timer = null;
 
@@ -46,8 +45,9 @@ primus.on('connection', function (spark) {
       return;
     }
 
+    console.log('joining room', room);
+
     spark.join(room, function () {
-      console.log('joining rom', room);
       console.log('I am in: ', spark.rooms());
     });
 
@@ -61,5 +61,6 @@ primus.on('connection', function (spark) {
 
 // Start server listening
 server.listen(process.env.PORT || 8080, function(){
-  console.log('\033[96mlistening on localhost:8081 \033[39m');
+  var bound = server.address()
+  console.log('\033[96mlistening on %s:%d \033[39m', bound.address, bound.port);
 });

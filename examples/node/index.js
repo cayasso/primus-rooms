@@ -1,4 +1,4 @@
-var Rooms = require('../../');
+var rooms = require('../../');
 var Primus = require('primus');
 var http = require('http');
 var server = http.createServer();
@@ -6,10 +6,10 @@ var server = http.createServer();
 
 
 // THE SERVER
-var primus = new Primus(server, { transformer: 'websockets', parser: 'JSON' });
+var primus = new Primus(server);
 
 // Add room functionality to primus
-primus.use('rooms', Rooms);
+primus.plugin('rooms', rooms);
 
 // Server stuff
 primus.on('connection', function(spark){
@@ -82,6 +82,7 @@ setTimeout(function () {
   setClient('room1');
 }, 10);
 
-server.listen(process.env.PORT || 8080, function(){
-  console.log('\033[96mlistening on localhost:9000 \033[39m');
+server.listen(process.env.PORT || 8080, function() {
+  var bound = server.address()
+  console.log('\033[96mlistening on %s:%d \033[39m', bound.address, bound.port);
 });

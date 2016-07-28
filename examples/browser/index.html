@@ -12,7 +12,7 @@
     <script>
       function client(room) {
 
-        var primus = new Primus.connect('ws://localhost:8080');
+        var primus = new Primus.connect('http://localhost:8080');
 
         primus.on('open', function () {
 
