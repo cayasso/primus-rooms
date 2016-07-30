@@ -1,66 +1,33 @@
-var rooms = require('../../')
-  , Primus = require('primus')
-  , http = require('http')
-  , fs = require('fs');
+'use strict';
 
-var server = http.createServer(function server(req, res) {
+const Primus = require('primus');
+const http = require('http');
+const fs = require('fs');
+
+const rooms = require('../../');
+
+const server = http.createServer((req, res) => {
   res.setHeader('Content-Type', 'text/html');
   fs.createReadStream(__dirname + '/index.html').pipe(res);
 });
 
+const primus = new Primus(server);
 
-// Primus server.
-var primus = new Primus(server);
-
-
-// add rooms to Primus
+// Add room plugin
 primus.plugin('rooms', rooms);
 
-var timer = null;
-
-primus.on('connection', function (spark) {
-
-  spark.on('data', function (room) {
-
-    if ('me' === room) {
-
-      // clear previous interval
-      clearInterval(timer);
-
-      timer = setInterval(function () {
-
-        // send data to room1
-        spark.room('room2').write('hi');
-
-        // send data to room1 & room3
-        spark.room('room1 room3').write('hello room 1 & 3');
-
-        // get clients connected to room1
-        spark.room('room3').clients(function(error, clients) {
-          console.log('CLIENTS', clients); // output array of spark ids
-        });
-
-      }, 5000);
-
-      return;
+primus.on('connection', (spark) => {
+  spark.on('data', (room) => {
+    if (room !== 'me') {
+      return spark.join(room, () => console.log('joined room %s', room));
     }
 
-    console.log('joining room', room);
+    spark.room('room1 room3').write('hello room 1 & 3');
+    spark.room('room2').write('hi');
 
-    spark.join(room, function () {
-      console.log('I am in: ', spark.rooms());
-    });
-
-    // leaving room room2
-    spark.leave('room2');
-
+    // Get clients connected to room3
+    spark.room('room3').clients((err, clients) => console.log(clients));
   });
-
 });
 
-
-// Start server listening
-server.listen(process.env.PORT || 8080, function(){
-  var bound = server.address()
-  console.log('\033[96mlistening on %s:%d \033[39m', bound.address, bound.port);
-});
+server.listen(() => console.log('listening on *:%d', server.address().port));

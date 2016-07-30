@@ -1,5 +1,5 @@
 {
-  "name": "primus-rooms-test",
+  "name": "primus-rooms-browser-test",
   "version": "0.0.0",
   "author": "Jonathan Brumley <cayasso@gmail.com>",
   "main": "index.js",

@@ -1,55 +1,43 @@
-<!Doctype html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="utf-8">
     <title>Primus Rooms Test</title>
-    <script src="/primus/primus.js"></script>
   </head>
   <body>
-
     <h1>Welcome to Primus Rooms example.</h2>
-
+    <script src="/primus/primus.js"></script>
     <script>
-      function client(room) {
+      (function () {
+        function client(room) {
+          var primus = new Primus();
 
-        var primus = new Primus.connect('http://localhost:8080');
+          primus.on('open', function () {
+            // Send request to join the room
+            primus.write(room);
 
-        primus.on('open', function () {
+            if ('room1' === room) {
+              // Also connect to room3
+              primus.write('room3');
+            }
+          });
 
-          // Send request to join the news room
-          primus.write(room);
+          primus.on('data', function (data) {
+            console.log(data);
+          });
+        }
 
-          if ('room1' === room) {
-            // also connect to room3
-            primus.write('room3');
-          }
+        // Create 4 clients
+        client('room1');
+        client('room2');
+        client('room3');
+        client('room4');
 
-        });
-
-        // on data received
-        primus.on('data', function (data) {
-          console.log('MSG:', data);
-        });
-      }
-
-      // Set one more client
-      client('room1');
-
-
-      // Set one more client
-      client('room2');
-
-
-      // Set one more client
-      client('room3');
-
-      // Set one more client
-      client('room4');
-
-      // special client
-      client('me');
-
-
+        // Special client
+        setTimeout(function () {
+          client('me');
+        }, 10);
+      })();
     </script>
   </body>
 </html>

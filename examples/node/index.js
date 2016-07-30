@@ -1,88 +1,46 @@
-var rooms = require('../../');
-var Primus = require('primus');
-var http = require('http');
-var server = http.createServer();
+'use strict';
 
+const Primus = require('primus');
+const http = require('http');
 
+const rooms = require('../../');
 
-// THE SERVER
-var primus = new Primus(server);
+const server = http.createServer();
+const primus = new Primus(server);
 
-// Add room functionality to primus
+// Add room plugin
 primus.plugin('rooms', rooms);
 
-// Server stuff
-primus.on('connection', function(spark){
-
-  // testing regular
-  spark.on('data', function(data){
-
-    // joining a room
-    spark.join(data);
-
-    // broadcasting to rooms
-    if (data === 'me') {
-      console.log('------- ------- -------');
-      spark.room('room1 room2 room3 room4').write('- WELCOME -');
-      spark.room('room4').write('- BIENVENIDOS -');
-      spark.leave(data);
+primus.on('connection', (spark) => {
+  spark.on('data', (data) => {
+    if (data !== 'me') {
+      return spark.join(data, () => console.log('joined room %s', data));
     }
+
+    spark.room('room1 room2 room3 room4').write('Welcome');
+    spark.room('room4').write('Bienvenidos');
   });
 });
 
-
-
-// THE CLIENT
-function setClient (room) {
-
-  var Socket = primus.Socket;
-  var socket = new Socket('ws://localhost:8080');
+const client = (room) => {
+  const socket = new primus.Socket(`http://localhost:${server.address().port}`);
 
   if (room === 'me') {
-    setInterval(function(){
-      socket.write(room);
-    }, 1500);
+    setInterval(() => socket.write(room), 3000);
   } else {
     socket.write(room);
   }
 
-  // on data received
-  socket.on('data', function (data) {
-    console.log('MSG:', data);
-  });
-}
+  socket.on('data', (data) => console.log(data));
+};
 
-// Set first client
-setTimeout(function () {
-  setClient('me');
-}, 10);
+server.listen(() => {
+  console.log('listening on *:%d', server.address().port);
 
-// Set one more client
-setTimeout(function () {
-  setClient('room1');
-}, 100);
+  client('room1');
+  client('room2');
+  client('room3');
+  client('room4');
 
-// Set one more client
-setTimeout(function () {
-  setClient('room2');
-}, 10);
-
-// Set one more client
-setTimeout(function () {
-  setClient('room3');
-}, 10);
-
-// Set one more client
-setTimeout(function () {
-  setClient('room4');
-}, 10);
-
-// Set one more client
-setTimeout(function () {
-  setClient('room1');
-}, 10);
-
-server.listen(process.env.PORT || 8080, function() {
-  var bound = server.address()
-  console.log('\033[96mlistening on %s:%d \033[39m', bound.address, bound.port);
+  setTimeout(() => client('me'), 10);
 });
